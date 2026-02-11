@@ -1,0 +1,15 @@
+[Unit]
+Description=Tide OS First Boot Setup
+After=network.target ollama.service
+Requires=ollama.service
+ConditionPathExists=!/etc/tide/.firstboot-complete
+
+[Service]
+Type=oneshot
+ExecStart=/opt/tide/bin/tide-firstboot.sh
+StandardOutput=journal
+StandardError=journal
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
