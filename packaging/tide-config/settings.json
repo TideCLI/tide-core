@@ -1,0 +1,7 @@
+{
+  "defaultProvider": "ollama",
+  "defaultModel": "glm-4.7-flash:latest",
+  "defaultThinkingLevel": "off",
+  "quietStartup": false,
+  "theme": "dark"
+}

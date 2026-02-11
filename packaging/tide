@@ -1,0 +1,17 @@
+#!/bin/bash
+# Tide CLI - Offline AI coding assistant
+# Usage: tide [options] [prompt]
+
+TIDE_DIR="/home/snoozescript/tide-os/third_party/pi-mono"
+DEFAULT_MODEL="llama3.1:8b"
+
+# Check if Ollama is running
+if ! curl -s http://localhost:11434/api/tags > /dev/null 2>&1; then
+    echo "⚠️  Starting Ollama..."
+    ollama serve > /dev/null 2>&1 &
+    sleep 3
+fi
+
+# Run tide with ollama as default provider
+cd "$TIDE_DIR"
+exec node packages/coding-agent/dist/cli.js --provider ollama --model "$DEFAULT_MODEL" "$@"
