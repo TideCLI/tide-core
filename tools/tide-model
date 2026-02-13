@@ -1,0 +1,408 @@
+#!/usr/bin/env python3
+"""
+Tide Model Manager - Download and manage Ollama models
+This tool is included in Tide OS ISO for offline model management
+"""
+
+import os
+import sys
+import json
+import subprocess
+import argparse
+from typing import List, Dict, Optional
+from pathlib import Path
+
+
+# ANSI Colors
+class Colors:
+    CYAN = '\033[0;36m'
+    GREEN = '\033[0;32m'
+    YELLOW = '\033[1;33m'
+    RED = '\033[0;31m'
+    BLUE = '\033[0;34m'
+    RESET = '\033[0m'
+    BOLD = '\033[1m'
+
+
+def print_banner():
+    """Print Tide model manager banner"""
+    banner = f"""
+{Colors.CYAN}╔═══════════════════════════════════════════════════════════════════╗
+║                                                                       ║
+║    {Colors.BOLD}🌊 Tide Model Manager{Colors.RESET}{Colors.CYAN}                                      ║
+║                                                                       ║
+║    {Colors.BLUE}Download & Manage Ollama Models Locally{Colors.CYAN}                    ║
+║                                                                       ║
+╚═══════════════════════════════════════════════════════════════════╝{Colors.RESET}
+"""
+    print(banner)
+
+
+def print_status(msg: str, status: str = "info"):
+    """Print status message"""
+    symbols = {
+        "info": f"{Colors.BLUE}ℹ{Colors.RESET}",
+        "success": f"{Colors.GREEN}✓{Colors.RESET}",
+        "warn": f"{Colors.YELLOW}⚠{Colors.RESET}",
+        "error": f"{Colors.RED}✗{Colors.RESET}",
+        "download": f"{Colors.CYAN}↓{Colors.RESET}"
+    }
+    print(f"  {symbols.get(status, 'ℹ')} {msg}")
+
+
+class ModelManager:
+    """Manages Ollama models"""
+    
+    # Recommended models for Tide OS
+    RECOMMENDED_MODELS = {
+        "qwen3:latest": {
+            "name": "Qwen 3",
+            "description": "Fast, capable multilingual model - RECOMMENDED",
+            "size": "~4.7GB",
+            "category": "general",
+            "tags": ["chat", "general", "fast"]
+        },
+        "llama3.1:8b": {
+            "name": "Llama 3.1 8B",
+            "description": "Meta's latest instruction-following model",
+            "size": "~4.9GB",
+            "category": "general",
+            "tags": ["chat", "general"]
+        },
+        "codellama:7b": {
+            "name": "CodeLlama 7B",
+            "description": "Specialized for code generation and programming",
+            "size": "~3.8GB",
+            "category": "coding",
+            "tags": ["code", "programming"]
+        },
+        "mistral:7b": {
+            "name": "Mistral 7B",
+            "description": "Balanced performance for various tasks",
+            "size": "~4.1GB",
+            "category": "general",
+            "tags": ["chat", "balanced"]
+        },
+        "phi3:mini": {
+            "name": "Phi-3 Mini",
+            "description": "Lightweight and efficient model",
+            "size": "~2.3GB",
+            "category": "lightweight",
+            "tags": ["fast", "efficient"]
+        },
+        "nomic-embed-text:latest": {
+            "name": "Nomic Embed Text",
+            "description": "High-quality text embeddings",
+            "size": "~274MB",
+            "category": "embeddings",
+            "tags": ["embedding", "search"]
+        },
+    }
+    
+    def __init__(self):
+        self.ollama_path = self._find_ollama()
+        
+    def _find_ollama(self) -> str:
+        """Find ollama executable"""
+        # Check PATH
+        import shutil
+        path = shutil.which("ollama")
+        if path:
+            return path
+            
+        # Common locations
+        common_paths = [
+            "/usr/bin/ollama",
+            "/usr/local/bin/ollama",
+            "~/.local/bin/ollama"
+        ]
+        
+        for p in common_paths:
+            expanded = os.path.expanduser(p)
+            if os.path.exists(expanded):
+                return expanded
+                
+        return "ollama"
+    
+    def is_ollama_running(self) -> bool:
+        """Check if Ollama is running"""
+        try:
+            import urllib.request
+            req = urllib.request.Request("http://localhost:11434/api/tags")
+            with urllib.request.urlopen(req, timeout=5) as response:
+                return response.status == 200
+        except Exception:
+            return False
+            
+    def check_ollama(self) -> bool:
+        """Ensure Ollama is available and running"""
+        if not self.is_ollama_running():
+            print_status("Ollama is not running. Starting it now...", "warn")
+            self.start_ollama()
+            import time
+            for i in range(10):
+                if self.is_ollama_running():
+                    print_status("Ollama started successfully", "success")
+                    return True
+                time.sleep(1)
+            print_status("Could not start Ollama", "error")
+            return False
+        return True
+        
+    def start_ollama(self):
+        """Start Ollama service"""
+        try:
+            subprocess.Popen(
+                [self.ollama_path, "serve"],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL
+            )
+        except Exception as e:
+            print_status(f"Failed to start Ollama: {e}", "error")
+            
+    def list_installed(self) -> List[Dict]:
+        """List installed models"""
+        try:
+            import urllib.request
+            import json
+            req = urllib.request.Request("http://localhost:11434/api/tags")
+            with urllib.request.urlopen(req, timeout=10) as response:
+                data = json.loads(response.read().decode())
+                return data.get("models", [])
+        except Exception:
+            return []
+            
+    def pull_model(self, model_name: str, progress: bool = True) -> Dict:
+        """Pull a model"""
+        print_status(f"Downloading {model_name}...", "download")
+        
+        try:
+            cmd = [self.ollama_path, "pull", model_name]
+            
+            if progress:
+                process = subprocess.Popen(
+                    cmd,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    text=True,
+                    bufsize=1
+                )
+                
+                for line in process.stdout:
+                    print(f"    {line.rstrip()}")
+                    
+                process.wait()
+            else:
+                result = subprocess.run(cmd, capture_output=True, text=True)
+                
+            if process.returncode == 0:
+                print_status(f"Successfully installed {model_name}", "success")
+                return {"success": True, "model": model_name}
+            else:
+                print_status(f"Failed to pull {model_name}", "error")
+                return {"success": False, "error": "Download failed"}
+        except Exception as e:
+            print_status(f"Error: {e}", "error")
+            return {"success": False, "error": str(e)}
+            
+    def remove_model(self, model_name: str) -> Dict:
+        """Remove a model"""
+        try:
+            result = subprocess.run(
+                [self.ollama_path, "rm", model_name],
+                capture_output=True,
+                text=True
+            )
+            
+            if result.returncode == 0:
+                print_status(f"Removed {model_name}", "success")
+                return {"success": True}
+            else:
+                return {"success": False, "error": result.stderr}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+            
+    def run_model(self, model_name: str):
+        """Run model interactively"""
+        try:
+            subprocess.run([self.ollama_path, "run", model_name])
+        except KeyboardInterrupt:
+            print("\nExited interactive mode")
+        except Exception as e:
+            print_status(f"Error: {e}", "error")
+            
+    def show_recommended(self):
+        """Show recommended models"""
+        print(f"\n  {Colors.BOLD}📦 Recommended Models:{Colors.RESET}\n")
+        
+        for name, info in self.RECOMMENDED_MODELS.items():
+            print(f"    {Colors.CYAN}{name}{Colors.RESET}")
+            print(f"       {info['description']}")
+            print(f"       Size: {info['size']} | Category: {info['category']}")
+            print()
+            
+    def auto_setup(self):
+        """Auto-setup with recommended models"""
+        print_status("Running auto-setup...", "info")
+        
+        # Check if models exist
+        installed = self.list_installed()
+        
+        if not installed:
+            print_status("No models found. Installing recommended model...", "warn")
+            result = self.pull_model("qwen3:latest")
+            
+            if result["success"]:
+                print_status("Auto-setup complete!", "success")
+            else:
+                print_status("Auto-setup failed", "error")
+        else:
+            print_status(f"Found {len(installed)} installed models", "success")
+
+
+def cmd_list(args):
+    """List installed models"""
+    mm = ModelManager()
+    
+    if not mm.check_ollama():
+        return 1
+        
+    installed = mm.list_installed()
+    
+    if not installed:
+        print_status("No models installed", "warn")
+        print("\nUse 'tide-model pull <model>' to install a model")
+        print("Or run 'tide-model setup' for automatic installation")
+        return 0
+        
+    print(f"\n  {Colors.BOLD}📦 Installed Models:{Colors.RESET}\n")
+    
+    for model in installed:
+        name = model.get("name", "unknown")
+        size = model.get("size", 0)
+        size_gb = size / (1024**3) if size else 0
+        
+        print(f"    {Colors.GREEN}●{Colors.RESET} {name}")
+        print(f"       Size: {size_gb:.2f} GB")
+        print()
+        
+    return 0
+
+
+def cmd_pull(args):
+    """Pull a model"""
+    mm = ModelManager()
+    
+    if not mm.check_ollama():
+        return 1
+        
+    # Show progress
+    result = mm.pull_model(args.model)
+    
+    return 0 if result["success"] else 1
+
+
+def cmd_remove(args):
+    """Remove a model"""
+    mm = ModelManager()
+    
+    if not mm.check_ollama():
+        return 1
+        
+    result = mm.remove_model(args.model)
+    
+    return 0 if result["success"] else 1
+
+
+def cmd_run(args):
+    """Run a model interactively"""
+    mm = ModelManager()
+    
+    if not mm.check_ollama():
+        return 1
+        
+    mm.run_model(args.model)
+    
+    return 0
+
+
+def cmd_setup(args):
+    """Auto-setup"""
+    mm = ModelManager()
+    
+    if not mm.check_ollama():
+        return 1
+        
+    mm.auto_setup()
+    
+    return 0
+
+
+def cmd_recommended(args):
+    """Show recommended models"""
+    mm = ModelManager()
+    mm.show_recommended()
+    return 0
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Tide Model Manager - Download & manage Ollama models",
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    
+    subparsers = parser.add_subparsers(dest="command", help="Commands")
+    
+    # List command
+    list_parser = subparsers.add_parser("list", help="List installed models")
+    list_parser.add_argument("-v", "--verbose", action="store_true")
+    
+    # Pull command
+    pull_parser = subparsers.add_parser("pull", help="Download a model")
+    pull_parser.add_argument("model", help="Model name (e.g., qwen3:latest)")
+    
+    # Remove command
+    remove_parser = subparsers.add_parser("remove", help="Remove a model")
+    remove_parser.add_argument("model", help="Model name to remove")
+    
+    # Run command
+    run_parser = subparsers.add_parser("run", help="Run model interactively")
+    run_parser.add_argument("model", help="Model name")
+    
+    # Setup command
+    setup_parser = subparsers.add_parser("setup", help="Auto-setup recommended models")
+    
+    # Recommended command
+    rec_parser = subparsers.add_parser("recommended", help="Show recommended models")
+    
+    args = parser.parse_args()
+    
+    print_banner()
+    
+    # Run command
+    if args.command == "list":
+        return cmd_list(args)
+    elif args.command == "pull":
+        return cmd_pull(args)
+    elif args.command == "remove":
+        return cmd_remove(args)
+    elif args.command == "run":
+        return cmd_run(args)
+    elif args.command == "setup":
+        return cmd_setup(args)
+    elif args.command == "recommended":
+        return cmd_recommended(args)
+    else:
+        # Show help
+        parser.print_help()
+        print("\nExamples:")
+        print("  tide-model list              # List installed models")
+        print("  tide-model pull qwen3:latest # Download Qwen 3")
+        print("  tide-model run llama3.1      # Run Llama interactively")
+        print("  tide-model setup             # Auto-install recommended models")
+        print("  tide-model recommended      # Show recommended models")
+        return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

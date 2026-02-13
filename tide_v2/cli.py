@@ -221,7 +221,10 @@ Examples:
   tide-v2                          # Start interactive mode
   tide-v2 "analyze agent.py"       # Quick chat
   tide-v2 --model codellama        # Use specific model
+  tide-v2 --model llama3.1:8b      # Use Llama 3.1 8B
+  tide-v2 --select-model           # Interactive model selection
   tide-v2 --tools                  # List all tools
+  tide-v2 --models                 # List available AI models
         """
     )
     
@@ -232,13 +235,23 @@ Examples:
     )
     parser.add_argument(
         "--model",
-        default="qwen3:latest",
-        help="Ollama model to use (default: qwen3:latest)"
+        default=None,
+        help="Ollama model to use (e.g., llama3.1:8b, qwen3, codellama)"
+    )
+    parser.add_argument(
+        "--select-model",
+        action="store_true",
+        help="Interactive model selection"
+    )
+    parser.add_argument(
+        "--models",
+        action="store_true",
+        help="List available AI models"
     )
     parser.add_argument(
         "--tools",
         action="store_true",
-        help="List all available tools and exit"
+        help="List all available tools"
     )
     parser.add_argument(
         "--working-dir",
@@ -251,13 +264,80 @@ Examples:
     # Show banner
     show_banner()
     
+    # Handle --models (list available models)
+    if args.models:
+        from .ollama_client import OllamaClient
+        client = OllamaClient.__new__(OllamaClient)
+        models = client.list_models()
+        
+        console.print("\n[bold cyan]🤖 Available AI Models[/bold cyan]\n")
+        
+        if models:
+            table = Table(title="Installed Models", box=box.ROUNDED)
+            table.add_column("Model", style="green")
+            table.add_column("Name", style="cyan")
+            table.add_column("Description", style="white")
+            table.add_column("Status", style="yellow")
+            
+            for model in models:
+                info = OllamaClient.RECOMMENDED_MODELS.get(model, {})
+                name = info.get("name", model)
+                desc = info.get("description", "Custom model")
+                status = "✓ Recommended" if info.get("recommended") else ""
+                table.add_row(model, name, desc, status)
+            
+            console.print(table)
+            
+            # Show how to use
+            console.print("\n[dim]Use with: tide-v2 --model <model_name>[/dim]")
+            console.print("[dim]Or: TIDE_MODEL=<model_name> tide-v2[/dim]\n")
+        else:
+            console.print("[yellow]No models installed![/yellow]")
+            console.print("\nInstall a model:")
+            console.print("  ollama pull llama3.1:8b")
+            console.print("  ollama pull qwen3:latest")
+            console.print("  ollama pull codellama:latest\n")
+        
+        return 0
+    
+    # Handle --select-model (interactive selection)
+    if args.select_model:
+        from .ollama_client import OllamaClient
+        client = OllamaClient.__new__(OllamaClient)
+        
+        # Temporarily create client to use selection
+        import os
+        os.environ['OLLAMA_HOST'] = os.environ.get('OLLAMA_HOST', 'http://localhost:11434')
+        
+        # Show interactive selection
+        from .config.settings import Settings
+        settings = Settings()
+        selected_model = settings.select_model_interactive()
+        
+        # Save to config
+        settings.model = selected_model
+        settings.save()
+        
+        console.print(f"\n[green]✓ Selected model: {selected_model}[/green]")
+        console.print(f"[dim]Saved to: {settings.config_file}[/dim]\n")
+        return 0
+    
     # Check Ollama
     if not check_ollama():
         return 1
     
-    # Initialize agent
+    # Get model from args or use default
+    model = args.model
+    if not model:
+        # Try to get from config or environment
+        from .config.settings import Settings
+        settings = Settings()
+        model = settings.model
+    
+    # Initialize agent with selected model
     try:
-        agent = TideAgent(model=args.model, working_dir=args.working_dir)
+        console.print(f"[dim]Using model: {model}[/dim]\n")
+        agent = TideAgent(model=model, working_dir=args.working_dir)
     except Exception as e:
         console.print(f"[red]Failed to initialize agent: {e}[/red]")
         return 1

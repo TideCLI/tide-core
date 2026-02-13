@@ -1,0 +1,21 @@
+{
+  "name": "tide-os",
+  "version": "2.0.0",
+  "description": "Tide OS - AI-Powered Terminal with local Ollama models",
+  "author": "Tide OS Team",
+  "license": "MIT",
+  "requires-python": ">=3.8",
+  "dependencies": {
+    "rich>=13.0.0",
+    "requests>=2.28.0"
+  },
+  "entry_points": {
+    "console_scripts": [
+      "tide=tide.cli.main:main"
+    ]
+  },
+  "scripts": {
+    "tide": "python3 -m tide.cli.main",
+    "tide-tui": "python3 -m tide.tui.interface"
+  }
+}

@@ -41,13 +41,106 @@ class ToolCall:
 
 
 class OllamaClient:
-    """Client for Ollama API"""
+    """Client for Ollama API with model selection"""
     
-    def __init__(self, model: str = "qwen3:latest", host: str = "http://localhost:11434"):
-        self.model = model
+    # Recommended models for coding
+    RECOMMENDED_MODELS = {
+        "llama3.1:8b": {
+            "description": "Meta Llama 3.1 (8B) - Excellent for coding",
+            "size": "~4.9 GB",
+            "strengths": "Best coding performance, reasoning, large context"
+        },
+        "qwen3:latest": {
+            "description": "Alibaba Qwen3 - Best for coding",
+            "size": "~4-8 GB",
+            "strengths": "Code generation, reasoning, multilingual"
+        },
+        "codellama:latest": {
+            "description": "Meta CodeLlama - Specialized for code",
+            "size": "~4-8 GB",
+            "strengths": "Code completion, debugging, documentation"
+        },
+        "llama3:latest": {
+            "description": "Meta Llama 3 - General purpose",
+            "size": "~4-8 GB",
+            "strengths": "General tasks, reasoning, chat"
+        },
+        "mistral:latest": {
+            "description": "Mistral AI - Efficient performance",
+            "size": "~4-5 GB",
+            "strengths": "Fast, efficient, good for most tasks"
+        },
+        "phi3:latest": {
+            "description": "Microsoft Phi-3 - Small but capable",
+            "size": "~2-4 GB",
+            "strengths": "Compact, efficient, good for laptops"
+        },
+        "gemma:latest": {
+            "description": "Google Gemma - Lightweight",
+            "size": "~2-5 GB",
+            "strengths": "Fast inference, good for simple tasks"
+        }
+    }
+    
+    def __init__(self, model: str = None, host: str = "http://localhost:11434"):
+        self.model = model or self._select_model()
         self.host = host
         self.chat_url = f"{host}/api/chat"
         self.generate_url = f"{host}/api/generate"
+    
+    def _select_model(self) -> str:
+        """Interactive model selection"""
+        print("\n🤖 Select AI Model:")
+        print("=" * 50)
+        
+        # Get available models from Ollama
+        available = self.list_models()
+        
+        if not available:
+            print("⚠️  No models found in Ollama!")
+            print("\nPlease install a model first:")
+            print("  ollama pull qwen3:latest")
+            print("  ollama pull codellama:latest")
+            return "qwen3:latest"
+        
+        # Show available models with info
+        print("\nInstalled models:")
+        for i, model in enumerate(available, 1):
+            info = self.RECOMMENDED_MODELS.get(model, {})
+            desc = info.get("description", "Custom model")
+            print(f"  {i}. {model}")
+            print(f"     {desc}")
+        
+        # Show recommended but not installed
+        not_installed = set(self.RECOMMENDED_MODELS.keys()) - set(available)
+        if not_installed:
+            print("\n📥 Recommended models (not installed):")
+            for model in not_installed:
+                info = self.RECOMMENDED_MODELS[model]
+                print(f"  • {model}")
+                print(f"    {info['description']}")
+                print(f"    Size: {info['size']}")
+                print(f"    Install: ollama pull {model}")
+        
+        # Let user choose
+        print("\n" + "=" * 50)
+        choice = input(f"Select model (1-{len(available)}) or enter model name [1]: ").strip()
+        
+        if not choice:
+            return available[0] if available else "qwen3:latest"
+        
+        # Check if numeric choice
+        if choice.isdigit():
+            idx = int(choice) - 1
+            if 0 <= idx < len(available):
+                return available[idx]
+        
+        # Check if valid model name
+        if choice in available:
+            return choice
+        
+        # Default
+        return available[0] if available else "qwen3:latest"
     
     def chat(self, messages: List[Message], tools: Optional[List[Dict]] = None, stream: bool = False) -> Dict[str, Any]:
         """Send chat request to Ollama"""

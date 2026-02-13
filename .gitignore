@@ -1,3 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+.mypy_cache/
+.dmypy.json
+*.egg-info/
+dist/
+build/
+wheels/
+*.manifest
+*.spec
+
 # Dependencies
 node_modules/
 package-lock.json

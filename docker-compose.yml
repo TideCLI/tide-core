@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  tide-os:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: tide-os:latest
+    container_name: tide-os
+    hostname: tide-os
+    
+    # Interactive mode
+    stdin_open: true
+    tty: true
+    
+    # Environment
+    environment:
+      - TIDE_OS_VERSION=2.0.0
+      - OLLAMA_HOST=0.0.0.0:11434
+    
+    # Ports
+    ports:
+      - "11434:11434"  # Ollama API
+    
+    # Volumes
+    volumes:
+      - tide-projects:/home/tide/projects
+      - ollama-models:/root/.ollama
+      - ./tide_v2:/home/tide/tide_v2:ro
+    
+    # Working directory
+    working_dir: /home/tide
+    
+    # Command
+    command: /bin/bash
+    
+    # Restart policy
+    restart: unless-stopped
+
+volumes:
+  tide-projects:
+    driver: local
+  ollama-models:
+    driver: local
