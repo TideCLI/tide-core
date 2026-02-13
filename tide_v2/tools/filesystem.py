@@ -557,3 +557,155 @@ class GlobTool(Tool):
             result.set_finished()
         
         return result
+
+
+class FileMoveTool(Tool):
+    """Move or rename files and directories"""
+    name = "file_move"
+    description = "Move or rename a file or directory to a new location"
+    category = "filesystem"
+    requires_confirmation = True
+    
+    parameters = [
+        ToolParameter("source", "string", "Source file or directory path", True),
+        ToolParameter("destination", "string", "Destination path", True),
+        ToolParameter("overwrite", "boolean", "Overwrite if destination exists", False, False)
+    ]
+    
+    def execute(self, params: Dict[str, Any]) -> ToolResult:
+        result = ToolResult(tool_name=self.name)
+        
+        try:
+            source = params.get("source", "")
+            destination = params.get("destination", "")
+            overwrite = params.get("overwrite", False)
+            
+            if not source or not destination:
+                result.error = "Both source and destination are required"
+                result.success = False
+                return result
+            
+            src_path = Path(self.working_dir) / source
+            dst_path = Path(self.working_dir) / destination
+            
+            # Validate source
+            if not src_path.exists():
+                result.error = f"Source not found: {source}"
+                result.success = False
+                return result
+            
+            # Check destination
+            if dst_path.exists() and not overwrite:
+                result.error = f"Destination already exists: {destination}. Use overwrite=true to replace."
+                result.success = False
+                return result
+            
+            # Create parent directories
+            dst_path.parent.mkdir(parents=True, exist_ok=True)
+            
+            # Perform move
+            shutil.move(str(src_path), str(dst_path))
+            
+            is_rename = src_path.parent == dst_path.parent
+            action = "Renamed" if is_rename else "Moved"
+            
+            result.output = f"{action}: {source} -> {destination}"
+            result.metadata = {
+                "source": str(src_path),
+                "destination": str(dst_path),
+                "action": action.lower(),
+                "is_directory": dst_path.is_dir()
+            }
+            
+        except Exception as e:
+            result.error = str(e)
+            result.success = False
+        finally:
+            result.set_finished()
+        
+        return result
+
+
+class FileDeleteTool(Tool):
+    """Delete files or directories"""
+    name = "file_delete"
+    description = "Delete a file or directory (use recursive=true for non-empty directories)"
+    category = "filesystem"
+    requires_confirmation = True
+    
+    parameters = [
+        ToolParameter("path", "string", "File or directory to delete", True),
+        ToolParameter("recursive", "boolean", "Delete non-empty directories recursively", False, False)
+    ]
+    
+    # Protected paths that cannot be deleted
+    PROTECTED = [".git", ".env", ".ssh", "node_modules"]
+    
+    def execute(self, params: Dict[str, Any]) -> ToolResult:
+        result = ToolResult(tool_name=self.name)
+        
+        try:
+            path_str = params.get("path", "")
+            recursive = params.get("recursive", False)
+            
+            if not path_str:
+                result.error = "path is required"
+                result.success = False
+                return result
+            
+            target = Path(self.working_dir) / path_str
+            target = target.resolve()
+            working = Path(self.working_dir).resolve()
+            
+            # Safety: must be inside working directory
+            if not str(target).startswith(str(working)):
+                result.error = "Cannot delete files outside the working directory"
+                result.success = False
+                return result
+            
+            # Safety: cannot delete working directory itself
+            if target == working:
+                result.error = "Cannot delete the working directory itself"
+                result.success = False
+                return result
+            
+            # Safety: protect critical paths
+            if target.name in self.PROTECTED:
+                result.error = f"Cannot delete protected path: {target.name}"
+                result.success = False
+                return result
+            
+            if not target.exists():
+                result.error = f"Path not found: {path_str}"
+                result.success = False
+                return result
+            
+            # Delete
+            if target.is_file() or target.is_symlink():
+                size = target.stat().st_size if target.is_file() else 0
+                os.remove(target)
+                result.output = f"Deleted file: {path_str} ({size} bytes)"
+                result.metadata = {"type": "file", "size": size}
+            
+            elif target.is_dir():
+                contents = list(target.iterdir())
+                
+                if contents and not recursive:
+                    result.error = (
+                        f"Directory is not empty ({len(contents)} items). "
+                        f"Use recursive=true to delete."
+                    )
+                    result.success = False
+                    return result
+                
+                shutil.rmtree(target)
+                result.output = f"Deleted directory: {path_str} ({len(contents)} items)"
+                result.metadata = {"type": "directory", "items": len(contents)}
+            
+        except Exception as e:
+            result.error = str(e)
+            result.success = False
+        finally:
+            result.set_finished()
+        
+        return result

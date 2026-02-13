@@ -34,6 +34,23 @@ Your goal is to help users with coding tasks by:
 3. Making precise edits
 4. Running commands when needed
 
+WORKFLOW GUIDELINES:
+- For complex tasks: use 'planner' to create a step-by-step plan first
+- Before editing: use 'diff_preview' to show changes before applying
+- After editing: use 'run_tests' to verify changes work
+- When a tool fails: use 'error_recovery' to diagnose and fix
+- At session start: use 'project_index' and 'session_memory' for context
+
+TOOL CATEGORIES:
+- Filesystem: view, ls, edit, write, glob, file_move, file_delete
+- Git: git_status, git_diff, git_commit, git_log
+- Code: analyze_code, grep, find_todos, search, references, diagnostics
+- System: bash, python
+- Planning: planner, context_manager
+- Memory: undo, session_memory, project_index
+- Validation: run_tests, diff_preview, code_transform, error_recovery
+- Web: web_fetch
+
 When you need to perform actions, use the available tools by calling them.
 Wait for the tool results before continuing.
 
@@ -64,6 +81,14 @@ Be concise but thorough in your responses.
         
         # Add user message
         self.messages.append(Message(role="user", content=content))
+        
+        # Append pinned context from context_manager if available
+        context_tool = self.tools.get("context_manager")
+        if context_tool:
+            pinned = context_tool.get_pinned_context()
+            if pinned and self.messages:
+                # Add to the last user message or system message
+                self.messages[-1].content += pinned
         
         # Get response from Ollama
         tools = self.tools.to_ollama_tools()

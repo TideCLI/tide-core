@@ -132,6 +132,31 @@ def interactive_mode(agent: TideAgent):
                 console.print(f"Tools: {stats['tools']['total_tools']}")
                 continue
             
+            elif user_input.lower() == 'plan':
+                result = agent.execute_tool_directly("planner", {"action": "get"})
+                console.print(Panel(result.output, title="Plan", border_style="cyan"))
+                continue
+            
+            elif user_input.lower() == 'undo':
+                result = agent.execute_tool_directly("undo", {"action": "list"})
+                console.print(Panel(result.output, title="Undo History", border_style="yellow"))
+                continue
+            
+            elif user_input.lower() == 'memory':
+                result = agent.execute_tool_directly("session_memory", {"action": "list"})
+                console.print(Panel(result.output, title="Memories", border_style="magenta"))
+                continue
+            
+            elif user_input.lower() == 'context':
+                result = agent.execute_tool_directly("context_manager", {"action": "status"})
+                console.print(Panel(result.output, title="Context", border_style="cyan"))
+                continue
+            
+            elif user_input.lower() == 'index':
+                result = agent.execute_tool_directly("project_index", {"action": "get"})
+                console.print(Panel(result.output, title="Project Index", border_style="green"))
+                continue
+            
             # Regular chat
             with Status("[bold blue]🤔 Thinking...[/bold blue]", spinner="dots"):
                 response = agent.chat(user_input)
@@ -165,15 +190,21 @@ def show_help():
 [bold]Special Commands:[/bold]
   [bold]tools[/bold]              - List all available tools
   [bold]tool <name> {...}[/bold]  - Execute tool directly (e.g., tool ls {"path": "."})
-  [bold]clear[/bold]             - Clear chat history
-  [bold]stats[/bold]             - Show agent statistics
-  [bold]help[/bold]              - Show this help
-  [bold]exit[/bold]              - Quit Tide
+  [bold]plan[/bold]               - Show current task plan
+  [bold]undo[/bold]               - Show undo/snapshot history
+  [bold]memory[/bold]             - Show saved session memories
+  [bold]context[/bold]            - Show context manager status
+  [bold]index[/bold]              - Show project index summary
+  [bold]clear[/bold]              - Clear chat history
+  [bold]stats[/bold]              - Show agent statistics
+  [bold]help[/bold]               - Show this help
+  [bold]exit[/bold]               - Quit Tide
 
 [bold]Examples:[/bold]
   [dim]> analyze the code in agent.py[/dim]
   [dim]> tool view {"file_path": "README.md"}[/dim]
-  [dim]> tool bash {"command": "ls -la"}[/dim]
+  [dim]> tool git_status {}[/dim]
+  [dim]> tool run_tests {"verbose": true}[/dim]
     """
     console.print(help_text)
 

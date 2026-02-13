@@ -80,6 +80,14 @@ class ToolRegistry:
                 tool_name=name
             )
         
+        # AUTO-SNAPSHOT: Before destructive operations, create undo snapshot
+        if tool.requires_confirmation and name != "undo":
+            undo_tool = self._tools.get("undo")
+            if undo_tool:
+                file_path = params.get("file_path", "") or params.get("source", "") or params.get("path", "")
+                if file_path:
+                    undo_tool.create_snapshot(file_path, name)
+        
         # Execute tool
         try:
             result = tool.execute(params)

@@ -1,0 +1,90 @@
+{
+  "model": "qwen3:latest",
+  "ollama": {
+    "host": "http://localhost:11434",
+    "timeout": 120
+  },
+  "tools": {
+    "bash": {
+      "require_confirmation": true,
+      "timeout": 30
+    },
+    "ls": {
+      "max_depth": 5,
+      "max_files": 1000
+    },
+    "edit": {
+      "create_backup": true,
+      "show_diff": true
+    },
+    "git_status": {
+      "require_confirmation": false,
+      "timeout": 15
+    },
+    "git_diff": {
+      "require_confirmation": false,
+      "timeout": 30,
+      "max_output": 30000
+    },
+    "git_commit": {
+      "require_confirmation": true,
+      "timeout": 15
+    },
+    "git_log": {
+      "require_confirmation": false,
+      "timeout": 15,
+      "max_commits": 100
+    },
+    "file_move": {
+      "require_confirmation": true,
+      "allow_overwrite": false
+    },
+    "file_delete": {
+      "require_confirmation": true,
+      "protected_paths": [".git", ".env", ".ssh", "node_modules"]
+    },
+    "planner": {
+      "require_confirmation": false,
+      "persist": true
+    },
+    "context_manager": {
+      "require_confirmation": false,
+      "context_window": 8192
+    },
+    "undo": {
+      "require_confirmation": false,
+      "max_snapshots": 100,
+      "snapshot_dir": ".tide/snapshots"
+    },
+    "session_memory": {
+      "require_confirmation": false,
+      "persist": true
+    },
+    "project_index": {
+      "require_confirmation": false,
+      "cache_ttl": 3600,
+      "max_files": 5000
+    },
+    "run_tests": {
+      "require_confirmation": false,
+      "timeout": 120,
+      "auto_detect": true
+    },
+    "diff_preview": {
+      "require_confirmation": false,
+      "context_lines": 3
+    },
+    "code_transform": {
+      "require_confirmation": true,
+      "timeout": 30
+    },
+    "error_recovery": {
+      "require_confirmation": false,
+      "auto_fix": false
+    }
+  },
+  "ui": {
+    "theme": "blue",
+    "show_line_numbers": true
+  }
+}
