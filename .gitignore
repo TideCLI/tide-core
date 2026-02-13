@@ -91,3 +91,6 @@ tide-cli/package-lock.json
 # Debug files
 *.log
 debug/
+
+# Documentation - excluded from base/raw-code branch
+TIDE_OS_COMPLETE_DOCUMENTATION.md

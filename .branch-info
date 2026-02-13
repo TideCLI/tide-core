@@ -1,0 +1,7 @@
+# base/raw-code
+
+This branch serves as a raw code snapshot of the Tide OS project.
+It contains the complete, unmodified source code for reference and reuse.
+
+Branch created from: main
+Purpose: Preserve raw codebase as a stable reference point
