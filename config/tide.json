@@ -1,0 +1,91 @@
+{
+  "$schema": "https://tide.local/schema.json",
+  "model": "hf.co/Edge-Quant/Nanbeige4.1-3B-Q4_K_M-GGUF:Q4_K_M",
+  "ollama": {
+    "host": "http://localhost:11434",
+    "timeout": 120,
+    "stream": true
+  },
+  "models": {
+    "nanbeige": {
+      "name": "hf.co/Edge-Quant/Nanbeige4.1-3B-Q4_K_M-GGUF:Q4_K_M",
+      "description": "Edge-Quant Nanbeige 4.1 3B - Fast & Efficient (2.4GB)",
+      "size": "2.4 GB",
+      "recommended": true,
+      "speed": "fast",
+      "provider": "ollama"
+    },
+    "llama3.1": {
+      "name": "llama3.1:8b",
+      "description": "Llama 3.1 8B - High Quality (4.9GB)",
+      "size": "4.9 GB",
+      "recommended": true,
+      "speed": "medium",
+      "provider": "ollama"
+    },
+    "qwen3": {
+      "name": "qwen3:latest",
+      "description": "Qwen 3 - Latest Generation",
+      "size": "Variable",
+      "recommended": true,
+      "speed": "medium",
+      "provider": "ollama"
+    },
+    "minimax-25": {
+      "name": "MiniMax-Text-01",
+      "description": "MiniMax 2.5 - API Based",
+      "size": "API",
+      "recommended": false,
+      "speed": "fast",
+      "provider": "minimax"
+    }
+  },
+  "tools": {
+    "bash": {
+      "require_confirmation": true,
+      "timeout": 30,
+      "banned_commands": [
+        "rm -rf /",
+        "mkfs",
+        "dd",
+        "> /dev/sda"
+      ]
+    },
+    "ls": {
+      "max_depth": 5,
+      "max_files": 1000,
+      "ignore": [
+        ".git",
+        "node_modules",
+        "__pycache__",
+        ".venv",
+        ".tox"
+      ]
+    },
+    "edit": {
+      "create_backup": true,
+      "show_diff": true
+    },
+    "grep": {
+      "max_results": 100,
+      "context_lines": 3
+    }
+  },
+  "ui": {
+    "theme": "blue",
+    "syntax_theme": "monokai",
+    "show_line_numbers": true,
+    "compact_mode": false
+  },
+  "permissions": {
+    "confirm_write": true,
+    "confirm_delete": true,
+    "confirm_bash": true,
+    "allow_outside_working_dir": false
+  },
+  "api_keys": {
+    "minimax": {
+      "note": "Set MINIMAX_API_KEY environment variable instead of storing here"
+    }
+  }
+}

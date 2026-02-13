@@ -1,0 +1,14 @@
+#!/bin/bash
+# Launch Tide with MiniMax API enabled
+# Usage: source bin/tide-minimax
+
+# Get the directory where this script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
+
+# Source the MiniMax config
+source "$PROJECT_DIR/config/minimax.env"
+
+# Run tide tui
+cd "$PROJECT_DIR"
+exec tide tui
