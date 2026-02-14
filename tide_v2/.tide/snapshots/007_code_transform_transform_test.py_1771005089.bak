@@ -1,0 +1,4 @@
+def old_function():
+    return "test"
+
+old_function()

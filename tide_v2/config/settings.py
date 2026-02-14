@@ -30,6 +30,76 @@ class Settings:
             "edit": {
                 "create_backup": True,
                 "show_diff": True
+            },
+            # Git tools
+            "git_status": {
+                "require_confirmation": False,
+                "timeout": 15
+            },
+            "git_diff": {
+                "require_confirmation": False,
+                "timeout": 30,
+                "max_output": 30000
+            },
+            "git_commit": {
+                "require_confirmation": True,
+                "timeout": 15
+            },
+            "git_log": {
+                "require_confirmation": False,
+                "timeout": 15,
+                "max_commits": 100
+            },
+            # Filesystem tools
+            "file_move": {
+                "require_confirmation": True,
+                "allow_overwrite": False
+            },
+            "file_delete": {
+                "require_confirmation": True,
+                "protected_paths": [".git", ".env", ".ssh", "node_modules"]
+            },
+            # Planning tools
+            "planner": {
+                "require_confirmation": False,
+                "persist": True
+            },
+            "context_manager": {
+                "require_confirmation": False,
+                "context_window": 8192
+            },
+            # Memory tools
+            "undo": {
+                "require_confirmation": False,
+                "max_snapshots": 100,
+                "snapshot_dir": ".tide/snapshots"
+            },
+            "session_memory": {
+                "require_confirmation": False,
+                "persist": True
+            },
+            "project_index": {
+                "require_confirmation": False,
+                "cache_ttl": 3600,
+                "max_files": 5000
+            },
+            # Testing tools
+            "run_tests": {
+                "require_confirmation": False,
+                "timeout": 120,
+                "auto_detect": True
+            },
+            "diff_preview": {
+                "require_confirmation": False,
+                "context_lines": 3
+            },
+            "code_transform": {
+                "require_confirmation": True,
+                "timeout": 30
+            },
+            "error_recovery": {
+                "require_confirmation": False,
+                "auto_fix": False
             }
         },
         "ui": {

@@ -1,0 +1,21 @@
+[
+  {
+    "id": 1,
+    "content": "Test memory",
+    "tags": [
+      "test"
+    ],
+    "timestamp": "2026-02-13T22:01:38.192315",
+    "working_dir": "tide_v2"
+  },
+  {
+    "id": 2,
+    "content": "Important: Always check tests after editing",
+    "tags": [
+      "workflow",
+      "important"
+    ],
+    "timestamp": "2026-02-13T23:20:33.958240",
+    "working_dir": "tide_v2"
+  }
+]
