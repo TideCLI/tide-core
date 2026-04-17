@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added OpenRouter API-key login flow and the `minimax/minimax-m2.5:free` OpenRouter model
+- Added `gpt-5.3-codex` to GitHub Copilot and `google/gemma-4-31b-it:free` to OpenRouter
+
+### Fixed
+
+- Fixed auth provider surface mismatches by exposing OpenRouter in the shared provider list used by login flows
+
 ## [12.2.0] - 2026-02-13
 
 ### Added
