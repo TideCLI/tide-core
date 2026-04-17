@@ -12,15 +12,17 @@ import { refreshOpenAICodexToken } from "./openai-codex";
 import type { OAuthCredentials, OAuthProvider, OAuthProviderInfo } from "./types";
 
 /**
- * OAuth credential management for AI providers.
+ * Credential management for AI providers.
  *
  * This module handles login, token refresh, and credential storage
- * for OAuth-based providers:
+ * for providers that use browser auth and/or manual API key entry:
  * - Anthropic (Claude Pro/Max)
  * - GitHub Copilot
  * - Google Cloud Code Assist (Gemini CLI)
  * - Antigravity (Gemini 3, Claude, GPT-OSS via Google Cloud)
  * - Kimi Code
+ * - MiniMax Coding Plan
+ * - OpenRouter
  * - Perplexity (Pro/Max — desktop app extraction or manual cookie)
  */
 
@@ -54,6 +56,8 @@ export type { OpenAICodexLoginOptions } from "./openai-codex";
 export { loginOpenAICodex, refreshOpenAICodexToken } from "./openai-codex";
 // OpenCode (API key)
 export { loginOpenCode } from "./opencode";
+// OpenRouter (API key)
+export { loginOpenRouter } from "./openrouter";
 // Perplexity
 export { loginPerplexity } from "./perplexity";
 export * from "./types";
@@ -104,6 +108,7 @@ export async function refreshOAuthToken(
 			break;
 		case "perplexity":
 		case "opencode":
+		case "openrouter":
 		case "zai":
 		case "minimax-code":
 		case "minimax-code-cn":
@@ -224,6 +229,11 @@ export function getOAuthProviders(): OAuthProviderInfo[] {
 		{
 			id: "opencode",
 			name: "OpenCode Zen",
+			available: true,
+		},
+		{
+			id: "openrouter",
+			name: "OpenRouter",
 			available: true,
 		},
 		{

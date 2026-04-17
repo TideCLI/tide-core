@@ -16,6 +16,7 @@ export type OAuthProvider =
 	| "kimi-code"
 	| "openai-codex"
 	| "opencode"
+	| "openrouter"
 	| "zai"
 	| "minimax-code"
 	| "minimax-code-cn"

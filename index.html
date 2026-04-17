@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>TIDE CLI — AI-Powered Coding Assistant</title>
+	<title>TIDE OS — The Intelligence-Driven Engine</title>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -15,25 +15,25 @@
 		}
 
 		:root {
-			--bg-primary: #08080c;
-			--bg-secondary: #0e0e14;
-			--bg-tertiary: #15151f;
-			--text-primary: #f4f4f8;
-			--text-secondary: #6b6b80;
-			--accent-cyan: #00e5ff;
-			--accent-magenta: #ff00c8;
-			--accent-purple: #a855f7;
-			--accent-green: #22d3ee;
-			--border-subtle: rgba(255, 255, 255, 0.05);
+			--bg: #030303;
+			--surface: #0a0a0a;
+			--surface-bright: #141414;
+			--border: rgba(255, 255, 255, 0.08);
+			--text-main: #ffffff;
+			--text-dim: #888888;
+			--accent: #ffffff;
+			--accent-soft: rgba(255, 255, 255, 0.1);
+			--glow: rgba(255, 255, 255, 0.05);
 		}
 
 		body {
-			font-family: 'Outfit', sans-serif;
-			background: var(--bg-primary);
-			color: var(--text-primary);
-			line-height: 1.6;
+			font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+			background: var(--bg);
+			color: var(--text-main);
+			line-height: 1.5;
 			min-height: 100vh;
 			overflow-x: hidden;
+			-webkit-font-smoothing: antialiased;
 		}
 
 		/* Animated background */
@@ -41,35 +41,27 @@
 			position: fixed;
 			inset: 0;
 			background-image: 
-				linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
-				linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
-			background-size: 60px 60px;
+				linear-gradient(var(--border) 1px, transparent 1px),
+				linear-gradient(90deg, var(--border) 1px, transparent 1px);
+			background-size: 50px 50px;
+			mask-image: radial-gradient(circle at 50% 50%, black, transparent 80%);
 			pointer-events: none;
 			z-index: 0;
+			opacity: 0.4;
 		}
 
 		.bg-glow {
 			position: fixed;
-			width: 600px;
-			height: 600px;
-			border-radius: 50%;
-			filter: blur(120px);
-			opacity: 0.4;
+			top: -10%;
+			left: 50%;
+			transform: translateX(-50%);
+			width: 80vw;
+			height: 40vw;
+			background: radial-gradient(circle, var(--glow), transparent 70%);
 			pointer-events: none;
 			z-index: 0;
 		}
 
-		.bg-glow-1 {
-			top: -200px;
-			right: -200px;
-			background: var(--accent-cyan);
-		}
-
-		.bg-glow-2 {
-			bottom: -300px;
-			left: -200px;
-			background: var(--accent-magenta);
-		}
 
 		.container {
 			position: relative;
@@ -81,8 +73,11 @@
 
 		/* Header */
 		header {
-			padding: 24px 0;
-			border-bottom: 1px solid var(--border-subtle);
+			padding: 32px 0;
+			position: sticky;
+			top: 0;
+			backdrop-filter: blur(12px);
+			z-index: 100;
 		}
 
 		nav {
@@ -94,28 +89,23 @@
 		.logo {
 			display: flex;
 			align-items: center;
-			gap: 12px;
-			font-size: 24px;
-			font-weight: 700;
-			letter-spacing: -0.5px;
-			transition: transform 0.3s ease;
+			gap: 8px;
+			font-size: 18px;
+			font-weight: 600;
+			letter-spacing: 1px;
+			text-transform: uppercase;
 		}
 
-		.logo:hover .logo-icon {
-			animation: float 2s ease-in-out infinite;
-		}
 
 		.logo-icon {
-			width: 40px;
-			height: 40px;
-			background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-			border-radius: 10px;
+			width: 24px;
+			height: 24px;
+			border: 1.5px solid var(--accent);
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			font-family: 'JetBrains Mono', monospace;
-			font-size: 18px;
-			font-weight: 600;
+			font-size: 12px;
+			font-weight: 800;
 		}
 
 		.nav-links {
@@ -125,10 +115,9 @@
 		}
 
 		.nav-links a {
-			color: var(--text-secondary);
+			color: var(--text-dim);
 			text-decoration: none;
-			font-size: 15px;
-			font-weight: 500;
+			font-size: 14px;
 			transition: color 0.2s;
 		}
 
@@ -138,25 +127,21 @@
 
 		/* Hero */
 		.hero {
-			padding: 120px 0 80px;
+			padding: 160px 0 100px;
 			text-align: center;
 		}
 
 		.hero h1 {
-			font-size: clamp(48px, 8vw, 80px);
+			font-size: clamp(40px, 10vw, 96px);
 			font-weight: 700;
-			line-height: 1.1;
-			letter-spacing: -2px;
-			margin-bottom: 24px;
+			line-height: 0.95;
+			letter-spacing: -0.04em;
+			margin-bottom: 32px;
 		}
 
-		.hero h1 .gradient {
-			background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta), var(--accent-purple));
-			-webkit-background-clip: text;
-			-webkit-text-fill-color: transparent;
-			background-clip: text;
-			background-size: 200% 200%;
-			animation: gradientShift 8s ease infinite;
+		.hero h1 span {
+			display: block;
+			color: var(--text-dim);
 		}
 
 		@keyframes gradientShift {
@@ -167,10 +152,9 @@
 
 		.hero p {
 			font-size: 20px;
-			color: var(--text-secondary);
-			max-width: 600px;
+			color: var(--text-dim);
+			max-width: 540px;
 			margin: 0 auto 48px;
-			font-weight: 300;
 		}
 
 		.cta-group {
@@ -183,21 +167,18 @@
 		.btn {
 			display: inline-flex;
 			align-items: center;
-			gap: 8px;
-			padding: 14px 28px;
-			border-radius: 10px;
-			font-size: 16px;
-			font-weight: 600;
+			padding: 12px 24px;
+			border-radius: 4px;
+			font-size: 14px;
+			font-weight: 500;
 			text-decoration: none;
 			transition: all 0.2s;
 			cursor: pointer;
-			border: none;
-			font-family: inherit;
 		}
 
 		.btn-primary {
-			background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-			color: var(--bg-primary);
+			background: var(--accent);
+			color: var(--bg);
 		}
 
 		.btn-primary:hover {
@@ -206,9 +187,9 @@
 		}
 
 		.btn-secondary {
-			background: var(--bg-tertiary);
-			color: var(--text-primary);
-			border: 1px solid var(--border-subtle);
+			background: transparent;
+			color: var(--text-main);
+			border: 1px solid var(--border);
 		}
 
 		.btn-secondary:hover {
@@ -218,20 +199,21 @@
 
 		/* Code demo */
 		.demo {
-			margin-top: 80px;
-			background: var(--bg-secondary);
-			border: 1px solid var(--border-subtle);
-			border-radius: 16px;
+			margin-top: 100px;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 8px;
 			overflow: hidden;
 			text-align: left;
+			box-shadow: 0 40px 100px rgba(0,0,0,0.5);
 		}
 
 		.demo-header {
 			display: flex;
-			gap: 8px;
-			padding: 16px 20px;
-			background: var(--bg-tertiary);
-			border-bottom: 1px solid var(--border-subtle);
+			align-items: center;
+			padding: 12px 16px;
+			background: var(--surface-bright);
+			border-bottom: 1px solid var(--border);
 		}
 
 		.demo-dot {
@@ -317,13 +299,11 @@
 		}
 
 		.feature-card {
-			background: var(--bg-secondary);
-			border: 1px solid var(--border-subtle);
-			border-radius: 16px;
-			padding: 32px;
-			transition: all 0.3s ease;
-			position: relative;
-			overflow: hidden;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			padding: 40px;
+			transition: border-color 0.3s;
 		}
 
 		.feature-card::before {
@@ -341,21 +321,13 @@
 		}
 
 		.feature-card:hover {
-			border-color: rgba(168, 85, 247, 0.4);
-			transform: translateY(-4px);
-			box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 60px rgba(168, 85, 247, 0.1);
+			border-color: var(--text-dim);
 		}
 
 		.feature-icon {
-			width: 48px;
-			height: 48px;
-			background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
-			border-radius: 12px;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			margin-bottom: 20px;
 			font-size: 24px;
+			margin-bottom: 24px;
+			color: var(--text-dim);
 		}
 
 		.feature-card h3 {
@@ -526,9 +498,7 @@
 	</style>
 </head>
 <body>
-	<div class="bg-grid"></div>
-	<div class="bg-glow bg-glow-1"></div>
-	<div class="bg-glow bg-glow-2"></div>
+	<div class="bg-glow"></div>
 
 	<header>
 		<div class="container">
@@ -548,7 +518,7 @@
 
 	<section class="hero">
 		<div class="container">
-			<h1>The AI Coding Assistant<br><span class="gradient">for your terminal</span></h1>
+			<h1>Intelligence-Driven<span>Engine for Terminal</span></h1>
 			<p>TIDE is a powerful CLI tool that brings AI-powered coding assistance directly to your terminal. Built with Bun, powered by LLMs, designed for developers.</p>
 			<div class="cta-group">
 				<a href="#install" class="btn btn-primary">Install Now →</a>
@@ -576,34 +546,33 @@
 				<div class="feature-card">
 					<div class="feature-icon">⚡</div>
 					<h3>Blazing Fast</h3>
-					<p>Built on Bun with Rust-powered native operations. Text processing, grep, and image operations run at native speed.</p>
+					<p>Engineered with Bun and Rust for near-instant performance in any environment.</p>
 				</div>
 				<div class="feature-card">
 					<div class="feature-icon">🖥️</div>
-					<h3>Terminal-First</h3>
-					<p>Beautiful TUI with differential rendering. Stay in your terminal — no context switching to browser-based AI tools.</p>
+					<h3>Terminal First</h3>
+					<p>A sophisticated TUI that replaces complex web interfaces with raw terminal power.</p>
 				</div>
 				<div class="feature-card">
 					<div class="feature-icon">🔗</div>
-					<h3>Multi-Provider</h3>
-					<p>Use OpenAI, Anthropic, Ollama, Cloudflare Workers AI, and more. Switch between providers seamlessly.</p>
+					<h3>Provider Agnostic</h3>
+					<p>Connect to OpenAI, Anthropic, or local LLMs. Your keys, your choice, your control.</p>
 				</div>
 				<div class="feature-card">
 					<div class="feature-icon">🧠</div>
-					<h3>Context Aware</h3>
-					<p>Understands your codebase. Reads files, runs commands, and maintains project context across sessions.</p>
+					<h3>Autonomous</h3>
+					<p>Not just a chat box. TIDE understands project architecture and executes complex tasks.</p>
 				</div>
 				<div class="feature-card">
 					<div class="feature-icon">🔧</div>
-					<h3>Tool Calling</h3>
-					<p>Execute code, run tests, use git, search files, and more. Full tool suite for real-world coding tasks.</p>
+					<h3>Tool Native</h3>
+					<p>Deep integration with git, shell, and file systems. It doesn't just suggest; it builds.</p>
 				</div>
 				<div class="feature-card">
 					<div class="feature-icon">📊</div>
-					<h3>Local Observability</h3>
-					<p>Built-in stats dashboard tracks token usage, costs, and performance. Know exactly what you're spending.</p>
+					<h3>Observable</h3>
+					<p>Full transparency with built-in analytics for token usage, latency, and cost tracking.</p>
 				</div>
-			</div>
 		</div>
 	</section>
 
@@ -732,4 +701,3 @@
 	</script>
 </body>
 </html>
- 

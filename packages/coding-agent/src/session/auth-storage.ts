@@ -20,6 +20,7 @@ import {
 	loginMiniMaxCodeCn,
 	loginOpenAICodex,
 	loginOpenCode,
+	loginOpenRouter,
 	loginPerplexity,
 	loginZai,
 	type OAuthController,
@@ -691,6 +692,11 @@ export class AuthStorage {
 				break;
 			case "opencode": {
 				const apiKey = await loginOpenCode(ctrl);
+				await saveApiKeyCredential(apiKey);
+				return;
+			}
+			case "openrouter": {
+				const apiKey = await loginOpenRouter(ctrl);
 				await saveApiKeyCredential(apiKey);
 				return;
 			}
