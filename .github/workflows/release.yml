@@ -82,7 +82,7 @@ jobs:
       - name: Build binary
         run: bun --cwd=packages/coding-agent run build:binary
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: omp-linux-x64
           path: packages/coding-agent/dist/omp
@@ -104,7 +104,7 @@ jobs:
       - name: Build ISO
         run: sudo bash scripts/build-iso.sh
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: tide-os-iso
           path: .build/iso/tide-os.iso
