@@ -9,8 +9,7 @@
 		// Inline to prevent flash of wrong theme on light-mode users
 		(() => {
 			const stored = localStorage.getItem('theme');
-			const theme = stored || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
-			document.documentElement.setAttribute('data-theme', theme);
+			document.documentElement.setAttribute('data-theme', stored || 'dark');
 		})();
 	</script>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
