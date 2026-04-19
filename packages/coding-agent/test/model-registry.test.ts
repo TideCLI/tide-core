@@ -598,8 +598,11 @@ describe("ModelRegistry", () => {
 				expect(ollamaModels.some(m => m.id === "llama3.2:3b")).toBe(true);
 
 				const available = registry.getAvailable().filter(m => m.provider === "ollama");
-				expect(available.length).toBe(2);
-				expect(await registry.getApiKey(available[0])).toBe("<no-auth>");
+				expect(available.length).toBeGreaterThanOrEqual(2);
+				expect(available.some(m => m.id === "qwen2.5-coder:7b")).toBe(true);
+				expect(available.some(m => m.id === "llama3.2:3b")).toBe(true);
+				const discoveredModel = available.find(m => m.id === "qwen2.5-coder:7b")!;
+				expect(await registry.getApiKey(discoveredModel)).toBe("<no-auth>");
 			} finally {
 				globalThis.fetch = originalFetch;
 			}
@@ -623,7 +626,10 @@ describe("ModelRegistry", () => {
 			try {
 				const registry = new ModelRegistry(authStorage, modelsJsonPath);
 				await registry.refresh();
-				expect(getModelsForProvider(registry, "ollama")).toHaveLength(0);
+				// Built-in ollama models remain even when discovery fails;
+				// no runtime-discovered models should be added
+				const ollamaModels = getModelsForProvider(registry, "ollama");
+				expect(ollamaModels.every(m => !m.id.includes(":"))).toBe(true);
 				expect(registry.getError()).toBeUndefined();
 			} finally {
 				globalThis.fetch = originalFetch;
