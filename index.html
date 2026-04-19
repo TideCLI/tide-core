@@ -1,12 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>TIDE OS — The Intelligence-Driven Engine</title>
+	<title>Tide — Terminal Intelligence Development Engine</title>
+	<meta name="description" content="Tide is an AI coding harness — a terminal-first scaffolding around LLMs with tools, memory, and project awareness. Available as a CLI or bootable live Linux ISO.">
+	<script>
+		// Inline to prevent flash of wrong theme on light-mode users
+		(() => {
+			const stored = localStorage.getItem('theme');
+			const theme = stored || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+			document.documentElement.setAttribute('data-theme', theme);
+		})();
+	</script>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Geist:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 	<style>
 		* {
 			margin: 0;
@@ -14,40 +23,93 @@
 			box-sizing: border-box;
 		}
 
-		:root {
-			--bg: #030303;
-			--surface: #0a0a0a;
-			--surface-bright: #141414;
-			--border: rgba(255, 255, 255, 0.08);
-			--text-main: #ffffff;
-			--text-dim: #888888;
-			--accent: #ffffff;
-			--accent-soft: rgba(255, 255, 255, 0.1);
-			--glow: rgba(255, 255, 255, 0.05);
+		:root,
+		[data-theme="dark"] {
+			--bg: #000000;
+			--surface: #060a10;
+			--surface-bright: #0c1219;
+			--border: rgba(125, 211, 252, 0.08);
+			--border-strong: rgba(125, 211, 252, 0.22);
+			--text-main: #e6f1ff;
+			--text-dim: #7a8ba0;
+			--text-faint: #4a5868;
+			--header-bg: rgba(3, 3, 3, 0.6);
+			--marquee-item-bg: rgba(6, 10, 16, 0.4);
+			--glow: rgba(59, 130, 246, 0.15);
+			--accent-soft: rgba(34, 211, 238, 0.12);
+			--grid-mask-opacity: 0.5;
+			--demo-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
+			--diff-add: #7ee2a8;
+			--diff-del: #f07c82;
+
+			/* Tide blue/cyan palette — matches the TUI logo gradient */
+			--tide-blue: #3b82f6;
+			--tide-cyan: #22d3ee;
+			--tide-mint: #5eead4;
+
+			/* Warm accent — matches update/warning tones in the TUI */
+			--tide-amber: #e8b77a;
+			--tide-orange: #d89c5f;
+
+			--accent: var(--tide-cyan);
+			--success: var(--tide-mint);
+			--warn: var(--tide-amber);
+			--gradient: linear-gradient(135deg, var(--tide-blue) 0%, var(--tide-cyan) 100%);
+		}
+
+		[data-theme="light"] {
+			--bg: #f7fafc;
+			--surface: #ffffff;
+			--surface-bright: #eef2f7;
+			--border: rgba(15, 42, 76, 0.1);
+			--border-strong: rgba(15, 42, 76, 0.22);
+			--text-main: #0b1a2e;
+			--text-dim: #526175;
+			--text-faint: #8a95a5;
+			--header-bg: rgba(247, 250, 252, 0.7);
+			--marquee-item-bg: rgba(255, 255, 255, 0.7);
+			--glow: rgba(59, 130, 246, 0.08);
+			--accent-soft: rgba(34, 211, 238, 0.1);
+			--grid-mask-opacity: 0.35;
+			--demo-shadow: 0 20px 60px -20px rgba(15, 42, 76, 0.15), 0 2px 8px rgba(15, 42, 76, 0.06);
+			--diff-add: #16a34a;
+			--diff-del: #dc2626;
+
+			--tide-blue: #2563eb;
+			--tide-cyan: #0891b2;
+			--tide-mint: #0d9488;
+			--tide-amber: #b8862f;
+			--tide-orange: #c2752f;
+		}
+
+		html {
+			scroll-behavior: smooth;
 		}
 
 		body {
-			font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+			font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif;
 			background: var(--bg);
 			color: var(--text-main);
 			line-height: 1.5;
 			min-height: 100vh;
 			overflow-x: hidden;
 			-webkit-font-smoothing: antialiased;
+			-moz-osx-font-smoothing: grayscale;
+			transition: background 0.2s, color 0.2s;
 		}
 
-		/* Animated background */
 		.bg-grid {
 			position: fixed;
 			inset: 0;
-			background-image: 
+			background-image:
 				linear-gradient(var(--border) 1px, transparent 1px),
 				linear-gradient(90deg, var(--border) 1px, transparent 1px);
 			background-size: 50px 50px;
-			mask-image: radial-gradient(circle at 50% 50%, black, transparent 80%);
+			mask-image: radial-gradient(circle at 50% 30%, black, transparent 75%);
+			-webkit-mask-image: radial-gradient(circle at 50% 30%, black, transparent 75%);
 			pointer-events: none;
 			z-index: 0;
-			opacity: 0.4;
+			opacity: var(--grid-mask-opacity);
 		}
 
 		.bg-glow {
@@ -66,17 +128,20 @@
 		.container {
 			position: relative;
 			z-index: 1;
-			max-width: 1200px;
+			max-width: 1160px;
 			margin: 0 auto;
 			padding: 0 24px;
 		}
 
 		/* Header */
 		header {
-			padding: 32px 0;
+			padding: 24px 0;
 			position: sticky;
 			top: 0;
 			backdrop-filter: blur(12px);
+			-webkit-backdrop-filter: blur(12px);
+			background: var(--header-bg);
+			border-bottom: 1px solid var(--border);
 			z-index: 100;
 		}
 
@@ -89,29 +154,36 @@
 		.logo {
 			display: flex;
 			align-items: center;
-			gap: 8px;
-			font-size: 18px;
+			gap: 10px;
+			font-size: 16px;
 			font-weight: 600;
-			letter-spacing: 1px;
+			letter-spacing: 1.5px;
 			text-transform: uppercase;
 		}
 
-
 		.logo-icon {
-			width: 24px;
-			height: 24px;
-			border: 1.5px solid var(--accent);
+			width: 28px;
+			height: 28px;
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			font-size: 12px;
-			font-weight: 800;
+			font-size: 22px;
+			line-height: 1;
+		}
+
+		.logo span {
+			background: var(--gradient);
+			-webkit-background-clip: text;
+			background-clip: text;
+			-webkit-text-fill-color: transparent;
+			color: transparent;
 		}
 
 		.nav-links {
 			display: flex;
-			gap: 32px;
+			gap: 28px;
 			list-style: none;
+			align-items: center;
 		}
 
 		.nav-links a {
@@ -122,44 +194,193 @@
 		}
 
 		.nav-links a:hover {
-			color: var(--text-primary);
+			color: var(--text-main);
 		}
+
+		.nav-links .github-link {
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+			padding: 6px 12px;
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			transition: border-color 0.2s, color 0.2s;
+		}
+
+		.nav-links .github-link:hover {
+			border-color: var(--border-strong);
+		}
+
+		.theme-toggle {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 32px;
+			height: 32px;
+			background: transparent;
+			border: 1px solid var(--border);
+			border-radius: 6px;
+			color: var(--text-dim);
+			cursor: pointer;
+			transition: color 0.2s, border-color 0.2s;
+			padding: 0;
+		}
+
+		.theme-toggle:hover {
+			color: var(--text-main);
+			border-color: var(--border-strong);
+		}
+
+		.theme-toggle svg {
+			width: 16px;
+			height: 16px;
+		}
+
+		[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
+		[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+		[data-theme="light"] .theme-toggle .icon-sun { display: none; }
+		[data-theme="light"] .theme-toggle .icon-moon { display: block; }
 
 		/* Hero */
 		.hero {
-			padding: 160px 0 100px;
+			padding: 120px 0 80px;
 			text-align: center;
 		}
 
-		.hero h1 {
-			font-size: clamp(40px, 10vw, 96px);
-			font-weight: 700;
-			line-height: 0.95;
-			letter-spacing: -0.04em;
+		.pill {
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			padding: 6px 14px;
+			border: 1px solid var(--border);
+			background: var(--accent-soft);
+			border-radius: 999px;
+			font-size: 12px;
+			letter-spacing: 1px;
+			text-transform: uppercase;
+			color: var(--tide-cyan);
 			margin-bottom: 32px;
 		}
 
-		.hero h1 span {
-			display: block;
-			color: var(--text-dim);
+		.pill .dot {
+			width: 6px;
+			height: 6px;
+			background: var(--tide-amber);
+			border-radius: 50%;
+			box-shadow: 0 0 10px var(--tide-amber);
 		}
 
-		@keyframes gradientShift {
-			0% { background-position: 0% 50%; }
+		.hero h1 {
+			font-weight: 700;
+			line-height: 0.95;
+			letter-spacing: -0.04em;
+			margin-bottom: 24px;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 12px;
+		}
+
+		.hero h1 .brand-main {
+			display: inline-block;
+			font-family: 'Geist Mono', 'JetBrains Mono', ui-monospace, monospace;
+			font-size: clamp(8px, 2.2vw, 26px);
+			line-height: 1.05;
+			letter-spacing: 0;
+			white-space: pre;
+			background: linear-gradient(
+				110deg,
+				var(--tide-blue) 0%,
+				var(--tide-cyan) 40%,
+				var(--tide-mint) 55%,
+				var(--tide-cyan) 70%,
+				var(--tide-blue) 100%
+			);
+			background-size: 200% 100%;
+			-webkit-background-clip: text;
+			background-clip: text;
+			-webkit-text-fill-color: transparent;
+			color: transparent;
+			animation: shimmer 6s ease-in-out infinite;
+			text-align: left;
+			margin: 20px 0;
+			font-weight: 400;
+		}
+
+		@keyframes shimmer {
+			0%, 100% { background-position: 0% 50%; }
 			50% { background-position: 100% 50%; }
-			100% { background-position: 0% 50%; }
 		}
 
-		.hero p {
-			font-size: 20px;
+		/* Floating keyboard shortcut chips */
+		.hero-chips {
+			display: flex;
+			justify-content: center;
+			gap: 10px;
+			flex-wrap: wrap;
+			margin: 0 auto 40px;
+		}
+
+		.chip {
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			padding: 6px 12px 6px 8px;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 999px;
+			font-size: 12px;
 			color: var(--text-dim);
-			max-width: 540px;
-			margin: 0 auto 48px;
+			transition: color 0.2s, border-color 0.2s;
+		}
+
+		.chip:hover {
+			color: var(--text-main);
+			border-color: var(--border-strong);
+		}
+
+		.chip kbd {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			min-width: 20px;
+			height: 20px;
+			padding: 0 5px;
+			background: var(--surface-bright);
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			font-family: 'Geist Mono', 'JetBrains Mono', ui-monospace, monospace;
+			font-size: 10.5px;
+			color: var(--tide-cyan);
+			font-weight: 600;
+		}
+
+		.hero h1 .brand-sub {
+			display: block;
+			font-size: clamp(14px, 1.6vw, 18px);
+			font-weight: 500;
+			color: var(--text-dim);
+			letter-spacing: 4px;
+			text-transform: uppercase;
+			margin-top: 8px;
+		}
+
+		.hero h1 .brand-sub b {
+			color: var(--tide-cyan);
+			font-weight: 600;
+		}
+
+		.hero .sub {
+			font-size: 19px;
+			color: var(--text-dim);
+			max-width: 620px;
+			margin: 0 auto 40px;
+			line-height: 1.6;
 		}
 
 		.cta-group {
 			display: flex;
-			gap: 16px;
+			gap: 12px;
 			justify-content: center;
 			flex-wrap: wrap;
 		}
@@ -167,50 +388,57 @@
 		.btn {
 			display: inline-flex;
 			align-items: center;
-			padding: 12px 24px;
-			border-radius: 4px;
+			gap: 8px;
+			padding: 12px 22px;
+			border-radius: 6px;
 			font-size: 14px;
 			font-weight: 500;
 			text-decoration: none;
-			transition: all 0.2s;
+			transition: transform 0.15s, background 0.2s, border-color 0.2s;
 			cursor: pointer;
+			border: 1px solid transparent;
 		}
 
 		.btn-primary {
-			background: var(--accent);
+			background: var(--gradient);
 			color: var(--bg);
+			font-weight: 600;
 		}
 
 		.btn-primary:hover {
-			transform: translateY(-2px);
-			box-shadow: 0 10px 40px rgba(0, 212, 255, 0.3);
+			transform: translateY(-1px);
+			box-shadow: 0 10px 30px rgba(34, 211, 238, 0.25);
 		}
 
 		.btn-secondary {
 			background: transparent;
 			color: var(--text-main);
-			border: 1px solid var(--border);
+			border-color: var(--border);
 		}
 
 		.btn-secondary:hover {
-			background: var(--bg-secondary);
-			border-color: var(--accent-cyan);
+			border-color: var(--border-strong);
+			background: var(--surface);
 		}
 
-		/* Code demo */
+		/* Terminal demo */
 		.demo {
-			margin-top: 100px;
+			margin-top: 72px;
 			background: var(--surface);
 			border: 1px solid var(--border);
-			border-radius: 8px;
+			border-radius: 10px;
 			overflow: hidden;
 			text-align: left;
-			box-shadow: 0 40px 100px rgba(0,0,0,0.5);
+			box-shadow: var(--demo-shadow);
+			max-width: 820px;
+			margin-left: auto;
+			margin-right: auto;
 		}
 
 		.demo-header {
 			display: flex;
 			align-items: center;
+			gap: 8px;
 			padding: 12px 16px;
 			background: var(--surface-bright);
 			border-bottom: 1px solid var(--border);
@@ -226,47 +454,333 @@
 		.demo-dot.yellow { background: #ffbd2e; }
 		.demo-dot.green { background: #27ca40; }
 
+		.demo-title {
+			margin-left: auto;
+			color: var(--text-faint);
+			font-size: 12px;
+			font-family: 'Geist Mono', 'JetBrains Mono', ui-monospace, monospace;
+		}
+
 		.demo-content {
-			padding: 24px;
-			font-family: 'JetBrains Mono', monospace;
-			font-size: 14px;
-			line-height: 1.8;
-			min-height: 200px;
+			padding: 0;
+			font-family: 'Geist Mono', 'JetBrains Mono', ui-monospace, monospace;
+			font-size: 13px;
+			line-height: 1.6;
+			min-height: 340px;
 		}
 
-		.demo-line {
-			display: flex;
-			gap: 16px;
+		/* TUI welcome screen — mirrors the actual Tide CLI on launch */
+		.tui-frame {
+			border: 1px solid var(--border-strong);
+			border-radius: 6px;
+			margin: 18px;
+			padding: 14px 18px 16px;
+			position: relative;
 		}
 
-		.demo-line .number {
-			color: var(--text-secondary);
-			opacity: 0.5;
-			user-select: none;
-			min-width: 24px;
+		.tui-frame::before {
+			content: 'Tide v0.0.2';
+			position: absolute;
+			top: -8px;
+			left: 16px;
+			padding: 0 8px;
+			background: var(--surface);
+			color: var(--tide-cyan);
+			font-size: 11px;
+			letter-spacing: 0.5px;
 		}
 
-		.demo-line .prompt {
-			color: var(--accent-green);
+		.tui-body {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 28px;
+			align-items: start;
 		}
 
-		.demo-line .output {
-			color: var(--text-secondary);
+		.tui-col-left {
+			text-align: center;
 		}
 
-		.demo-line .highlight {
-			color: var(--accent-cyan);
+		.tui-welcome {
+			color: var(--tide-cyan);
+			font-size: 12px;
+			margin-bottom: 6px;
 		}
 
-		/* Typing cursor */
-		.typing-cursor {
+		.tui-logo {
+			font-family: 'Geist Mono', 'JetBrains Mono', monospace;
+			font-size: 9px;
+			line-height: 1.05;
+			white-space: pre;
+			background: linear-gradient(
+				110deg,
+				var(--tide-blue) 0%,
+				var(--tide-cyan) 50%,
+				var(--tide-mint) 100%
+			);
+			background-size: 200% 100%;
+			-webkit-background-clip: text;
+			background-clip: text;
+			-webkit-text-fill-color: transparent;
+			color: transparent;
+			margin: 6px 0;
+			animation: shimmer 6s ease-in-out infinite;
 			display: inline-block;
-			width: 2px;
-			height: 1.2em;
-			background: var(--accent-green);
-			margin-left: 2px;
+			text-align: left;
+		}
+
+		.tui-cli-label {
+			color: var(--tide-cyan);
+			font-size: 11px;
+			letter-spacing: 3px;
+			margin: 2px 0 8px;
+		}
+
+		.tui-wave {
+			color: var(--text-faint);
+			font-size: 13px;
+			margin: 6px 0 10px;
+			letter-spacing: 3px;
+		}
+
+		.tui-model {
+			color: var(--tide-cyan);
+			font-size: 12px;
+		}
+
+		.tui-provider {
+			color: var(--text-dim);
+			font-size: 11px;
+			margin-top: 2px;
+		}
+
+		.tui-section-title {
+			color: var(--tide-cyan);
+			font-size: 12px;
+			margin-bottom: 6px;
+			font-weight: 600;
+		}
+
+		.tui-section {
+			margin-bottom: 14px;
+		}
+
+		.tui-section:last-child { margin-bottom: 0; }
+
+		.tui-list {
+			list-style: none;
+			padding: 0;
+			margin: 0;
+		}
+
+		.tui-list li {
+			color: var(--text-dim);
+			font-size: 11.5px;
+			padding: 1px 0;
+		}
+
+		.tui-key {
+			color: var(--tide-cyan);
+			font-weight: 600;
+			display: inline-block;
+			width: 14px;
+		}
+
+		.tui-list .session-bullet {
+			color: var(--tide-cyan);
+			margin-right: 4px;
+		}
+
+		.tui-list .session-name {
+			color: var(--text-main);
+		}
+
+		.tui-list .session-time {
+			color: var(--text-faint);
+			font-size: 10.5px;
+		}
+
+		.tui-divider {
+			border: none;
+			border-top: 1px dashed var(--border);
+			margin: 10px 0;
+		}
+
+		.tui-update {
+			margin: 14px 18px 0;
+			padding: 10px 14px;
+			border: 1px solid var(--tide-amber);
+			border-radius: 6px;
+			background: rgba(232, 183, 122, 0.05);
+			font-size: 12px;
+		}
+
+		.tui-update-title {
+			color: var(--tide-amber);
+			font-weight: 600;
+			margin-bottom: 2px;
+		}
+
+		.tui-update-body {
+			color: var(--text-dim);
+		}
+
+		.tui-update-body code {
+			color: var(--tide-amber);
+			font-family: inherit;
+		}
+
+		/* Animated demo session view (replaces welcome when demo runs) */
+		.tui-stage {
+			position: relative;
+		}
+
+		.tui-view {
+			transition: opacity 0.3s ease;
+		}
+
+		.tui-view[hidden] {
+			display: none;
+		}
+
+		.tui-session {
+			margin: 18px;
+			padding: 14px 16px;
+			border: 1px solid var(--border-strong);
+			border-radius: 6px;
+			position: relative;
+			min-height: 360px;
+			max-height: 360px;
+			overflow: hidden;
+			font-family: 'Geist Mono', 'JetBrains Mono', monospace;
+			font-size: 11.5px;
+			line-height: 1.55;
+		}
+
+		.tui-session::before {
+			content: 'Session · Claude Sonnet 4.6';
+			position: absolute;
+			top: -8px;
+			left: 16px;
+			padding: 0 8px;
+			background: var(--surface);
+			color: var(--tide-cyan);
+			font-size: 11px;
+		}
+
+		.session-msg {
+			margin-bottom: 8px;
+			opacity: 0;
+			animation: streamIn 0.25s ease-out forwards;
+		}
+
+		@keyframes streamIn {
+			from { opacity: 0; transform: translateY(4px); }
+			to { opacity: 1; transform: translateY(0); }
+		}
+
+		.session-user {
+			color: var(--tide-cyan);
+			font-weight: 600;
+		}
+
+		.session-user::before {
+			content: '› ';
+			color: var(--text-faint);
+		}
+
+		.session-thought {
+			color: var(--text-dim);
+			font-style: italic;
+		}
+
+		.session-tool {
+			display: flex;
+			align-items: baseline;
+			gap: 8px;
+			color: var(--text-main);
+		}
+
+		.session-tool .tool-icon {
+			color: var(--tide-cyan);
+		}
+
+		.session-tool .tool-label {
+			color: var(--tide-cyan);
+			font-weight: 600;
+			min-width: 54px;
+		}
+
+		.session-tool .tool-body {
+			color: var(--text-dim);
+		}
+
+		.session-diff {
+			margin: 2px 0 6px 20px;
+			padding: 6px 10px;
+			background: var(--surface-bright);
+			border-left: 2px solid var(--border-strong);
+			border-radius: 3px;
+			font-size: 11px;
+		}
+
+		.diff-line {
+			display: block;
+			white-space: pre;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+
+		.diff-add { color: var(--diff-add); }
+		.diff-del { color: var(--diff-del); text-decoration: line-through; opacity: 0.7; }
+		.diff-meta { color: var(--text-faint); }
+
+		.session-output {
+			margin: 2px 0 6px 20px;
+			padding: 6px 10px;
+			color: var(--text-dim);
+			font-size: 11px;
+			white-space: pre-line;
+		}
+
+		.session-done {
+			color: var(--tide-mint);
+			font-weight: 600;
+			padding-top: 4px;
+			border-top: 1px dashed var(--border);
+			margin-top: 6px;
+		}
+
+		.tui-prompt-bar {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			padding: 10px 14px;
+			margin: 14px 18px 18px;
+			background: var(--surface-bright);
+			border-radius: 6px;
+			font-size: 11.5px;
+			color: var(--text-dim);
+			overflow: hidden;
+			font-family: 'Geist Mono', 'JetBrains Mono', monospace;
+		}
+
+		.tui-prompt-bar .sep {
+			color: var(--text-faint);
+		}
+
+		.tui-prompt-bar .cyan {
+			color: var(--tide-cyan);
+		}
+
+		.tui-prompt-bar .cursor {
+			display: inline-block;
+			width: 7px;
+			height: 12px;
+			background: var(--tide-cyan);
 			animation: blink 1s step-end infinite;
-			vertical-align: text-bottom;
+			vertical-align: middle;
+			margin-left: 4px;
 		}
 
 		@keyframes blink {
@@ -274,243 +788,422 @@
 			51%, 100% { opacity: 0; }
 		}
 
-		@keyframes float {
-			0%, 100% { transform: translateY(0); }
-			50% { transform: translateY(-4px); }
+		@media (max-width: 640px) {
+			.tui-body { grid-template-columns: 1fr; gap: 14px; }
+			.tui-logo { font-size: 7px; }
+			.tui-prompt-bar { font-size: 10px; flex-wrap: wrap; }
+		}
+
+		/* Two-path section */
+		.paths {
+			padding: 80px 0 60px;
+		}
+
+		.section-heading {
+			text-align: center;
+			margin-bottom: 60px;
+		}
+
+		.section-heading h2 {
+			font-size: clamp(28px, 4vw, 40px);
+			font-weight: 600;
+			letter-spacing: -0.02em;
+			margin-bottom: 12px;
+		}
+
+		.section-heading p {
+			color: var(--text-dim);
+			font-size: 16px;
+			max-width: 540px;
+			margin: 0 auto;
+		}
+
+		.paths-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+			gap: 20px;
+		}
+
+		.path-card {
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 10px;
+			padding: 32px;
+			transition: border-color 0.25s, transform 0.25s;
+			position: relative;
+			overflow: hidden;
+		}
+
+		.path-card:hover {
+			border-color: var(--border-strong);
+			transform: translateY(-2px);
+		}
+
+		.path-card .label {
+			font-size: 11px;
+			letter-spacing: 2px;
+			text-transform: uppercase;
+			color: var(--tide-cyan);
+			margin-bottom: 16px;
+		}
+
+		.path-card li::before {
+			color: var(--tide-cyan);
+		}
+
+		.path-card h3 {
+			font-size: 26px;
+			font-weight: 600;
+			letter-spacing: -0.01em;
+			margin-bottom: 10px;
+		}
+
+		.path-card > p {
+			color: var(--text-dim);
+			font-size: 15px;
+			margin-bottom: 24px;
+			line-height: 1.6;
+		}
+
+		.path-card ul {
+			list-style: none;
+			margin-bottom: 24px;
+		}
+
+		.path-card li {
+			padding: 6px 0;
+			color: var(--text-dim);
+			font-size: 14px;
+			display: flex;
+			gap: 10px;
+		}
+
+		.path-card li::before {
+			content: '→';
+			flex-shrink: 0;
 		}
 
 		/* Features */
 		.features {
-			padding: 100px 0;
-		}
-
-		.features h2 {
-			text-align: center;
-			font-size: 40px;
-			font-weight: 600;
-			margin-bottom: 60px;
-			letter-spacing: -1px;
+			padding: 80px 0;
 		}
 
 		.features-grid {
 			display: grid;
-			grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-			gap: 24px;
+			grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+			gap: 16px;
 		}
 
 		.feature-card {
 			background: var(--surface);
 			border: 1px solid var(--border);
-			border-radius: 4px;
-			padding: 40px;
-			transition: border-color 0.3s;
+			border-radius: 8px;
+			padding: 28px;
+			transition: border-color 0.25s;
+			position: relative;
+			overflow: hidden;
 		}
 
 		.feature-card::before {
 			content: '';
 			position: absolute;
 			inset: 0;
-			background: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(168, 85, 247, 0.08), transparent 40%);
+			background: radial-gradient(400px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(34, 211, 238, 0.08), transparent 40%);
 			opacity: 0;
 			transition: opacity 0.4s;
 			pointer-events: none;
 		}
 
-		.feature-card:hover::before {
-			opacity: 1;
-		}
-
-		.feature-card:hover {
-			border-color: var(--text-dim);
-		}
+		.feature-card:hover::before { opacity: 1; }
+		.feature-card:hover { border-color: var(--border-strong); }
 
 		.feature-icon {
-			font-size: 24px;
-			margin-bottom: 24px;
-			color: var(--text-dim);
+			width: 36px;
+			height: 36px;
+			border: 1px solid var(--border-strong);
+			background: var(--accent-soft);
+			border-radius: 6px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 16px;
+			margin-bottom: 20px;
+			color: var(--tide-cyan);
 		}
 
 		.feature-card h3 {
-			font-size: 20px;
+			font-size: 17px;
 			font-weight: 600;
-			margin-bottom: 12px;
+			margin-bottom: 8px;
+			letter-spacing: -0.01em;
 		}
 
 		.feature-card p {
-			color: var(--text-secondary);
-			font-size: 15px;
+			color: var(--text-dim);
+			font-size: 14px;
+			line-height: 1.6;
+		}
+
+		/* Provider marquee */
+		.providers {
+			padding: 60px 0;
+			border-top: 1px solid var(--border);
+			border-bottom: 1px solid var(--border);
+			position: relative;
+			overflow: hidden;
+		}
+
+		.providers-label {
+			text-align: center;
+			font-size: 11px;
+			letter-spacing: 2.5px;
+			text-transform: uppercase;
+			color: var(--text-faint);
+			margin-bottom: 28px;
+		}
+
+		.marquee {
+			display: flex;
+			overflow: hidden;
+			mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+			-webkit-mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+		}
+
+		.marquee-track {
+			display: flex;
+			gap: 48px;
+			padding-right: 48px;
+			animation: scroll 32s linear infinite;
+			flex-shrink: 0;
+		}
+
+		.marquee:hover .marquee-track {
+			animation-play-state: paused;
+		}
+
+		.marquee-item {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			padding: 10px 22px;
+			border: 1px solid var(--border);
+			border-radius: 999px;
+			color: var(--text-dim);
+			font-size: 14px;
+			font-weight: 500;
+			white-space: nowrap;
+			transition: color 0.2s, border-color 0.2s;
+			background: var(--marquee-item-bg);
+		}
+
+		.marquee-item:hover {
+			color: var(--tide-cyan);
+			border-color: var(--border-strong);
+		}
+
+		.marquee-item .dot {
+			width: 6px;
+			height: 6px;
+			border-radius: 50%;
+			background: var(--tide-cyan);
+			opacity: 0.7;
+		}
+
+		@keyframes scroll {
+			0% { transform: translateX(0); }
+			100% { transform: translateX(-50%); }
 		}
 
 		/* Install section */
 		.install {
-			padding: 100px 0;
-			background: var(--bg-secondary);
-		}
-
-		.install h2 {
-			text-align: center;
-			font-size: 36px;
-			font-weight: 600;
-			margin-bottom: 40px;
-			letter-spacing: -1px;
+			padding: 80px 0;
 		}
 
 		.install-commands {
 			display: flex;
 			flex-direction: column;
-			gap: 16px;
-			max-width: 500px;
+			gap: 12px;
+			max-width: 680px;
 			margin: 0 auto;
 		}
 
 		.install-cmd {
-			background: var(--bg-primary);
-			border: 1px solid var(--border-subtle);
-			border-radius: 12px;
+			background: var(--surface);
+			border: 1px solid var(--border);
+			border-radius: 8px;
 			overflow: hidden;
-			transition: all 0.2s;
+			transition: border-color 0.2s;
 		}
 
-		.install-cmd:hover {
-			border-color: var(--accent-purple);
-		}
+		.install-cmd:hover { border-color: var(--border-strong); }
 
 		.install-label {
-			padding: 8px 16px;
-			background: var(--bg-tertiary);
-			font-size: 12px;
-			font-weight: 600;
-			color: var(--text-secondary);
+			padding: 10px 16px;
+			background: var(--surface-bright);
+			font-size: 11px;
+			font-weight: 500;
+			color: var(--tide-cyan);
 			text-transform: uppercase;
-			letter-spacing: 1px;
+			letter-spacing: 1.5px;
+			border-bottom: 1px solid var(--border);
 		}
 
 		.install-row {
 			display: flex;
 			align-items: center;
 			justify-content: space-between;
-			padding: 16px;
+			gap: 12px;
+			padding: 14px 16px;
 		}
 
 		.install-code {
-			font-family: 'JetBrains Mono', monospace;
-			font-size: 15px;
-			color: var(--accent-cyan);
+			font-family: 'Geist Mono', 'JetBrains Mono', ui-monospace, monospace;
+			font-size: 13.5px;
+			color: var(--tide-amber);
+			overflow-x: auto;
+			flex: 1;
 		}
 
 		.install-copy {
-			background: var(--bg-tertiary);
-			border: none;
-			color: var(--text-secondary);
+			background: transparent;
+			border: 1px solid var(--border);
+			color: var(--text-dim);
 			padding: 6px 12px;
-			border-radius: 6px;
+			border-radius: 5px;
 			cursor: pointer;
 			font-size: 12px;
 			font-weight: 500;
 			transition: all 0.2s;
+			flex-shrink: 0;
+			font-family: inherit;
 		}
 
 		.install-copy:hover {
-			background: var(--accent-purple);
-			color: white;
+			border-color: var(--border-strong);
+			color: var(--text-main);
+		}
+
+		.install-copy.copied {
+			color: var(--tide-amber);
+			border-color: var(--tide-amber);
 		}
 
 		/* Tech stack */
 		.tech {
-			padding: 80px 0;
-			border-top: 1px solid var(--border-subtle);
+			padding: 60px 0;
+			border-top: 1px solid var(--border);
 		}
 
-		.tech h2 {
+		.tech p.tech-label {
 			text-align: center;
-			font-size: 24px;
-			font-weight: 500;
-			color: var(--text-secondary);
-			margin-bottom: 40px;
+			font-size: 12px;
+			text-transform: uppercase;
+			letter-spacing: 2px;
+			color: var(--text-faint);
+			margin-bottom: 28px;
 		}
 
 		.tech-logos {
 			display: flex;
 			justify-content: center;
 			flex-wrap: wrap;
-			gap: 40px;
+			gap: 32px;
 			align-items: center;
 		}
 
 		.tech-item {
-			color: var(--text-secondary);
-			font-size: 18px;
+			color: var(--text-dim);
+			font-size: 15px;
 			font-weight: 500;
-			opacity: 0.6;
-			transition: opacity 0.2s;
+			opacity: 0.7;
+			transition: opacity 0.2s, color 0.2s;
 		}
 
 		.tech-item:hover {
 			opacity: 1;
+			color: var(--text-main);
 		}
 
 		/* Footer */
 		footer {
-			padding: 60px 0;
+			padding: 40px 0;
 			text-align: center;
-			color: var(--text-secondary);
-			font-size: 14px;
-			border-top: 1px solid var(--border-subtle);
-			background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.3));
+			color: var(--text-faint);
+			font-size: 13px;
+			border-top: 1px solid var(--border);
 		}
 
 		footer a {
-			color: var(--accent-cyan);
+			color: var(--text-dim);
 			text-decoration: none;
+			transition: color 0.2s;
+		}
+
+		footer a:hover { color: var(--text-main); }
+
+		footer .footer-links {
+			margin-bottom: 12px;
+			display: flex;
+			gap: 20px;
+			justify-content: center;
+			flex-wrap: wrap;
 		}
 
 		/* Animations */
 		@keyframes fadeInUp {
-			from {
-				opacity: 0;
-				transform: translateY(30px);
-			}
-			to {
-				opacity: 1;
-				transform: translateY(0);
-			}
+			from { opacity: 0; transform: translateY(20px); }
+			to { opacity: 1; transform: translateY(0); }
 		}
 
-		.hero h1, .hero p, .cta-group, .demo {
+		.hero .pill, .hero h1, .hero .sub, .cta-group, .demo {
 			opacity: 0;
-			animation: fadeInUp 0.8s ease-out forwards;
+			animation: fadeInUp 0.7s ease-out forwards;
 		}
 
-		.hero p { animation-delay: 0.15s; }
+		.hero .pill { animation-delay: 0s; }
+		.hero h1 { animation-delay: 0.1s; }
+		.hero .sub { animation-delay: 0.2s; }
 		.cta-group { animation-delay: 0.3s; }
 		.demo { animation-delay: 0.45s; }
 
-		.features-grid .feature-card {
-			opacity: 0;
-			animation: fadeInUp 0.6s ease-out forwards;
+		@media (max-width: 640px) {
+			.nav-links { gap: 16px; }
+			.nav-links li:first-child, .nav-links li:nth-child(2) { display: none; }
+			.hero { padding: 80px 0 60px; }
+			.demo-content { font-size: 12px; padding: 16px; }
+			.install-row { flex-direction: column; align-items: stretch; }
 		}
-		.features-grid .feature-card:nth-child(1) { animation-delay: 0.1s; }
-		.features-grid .feature-card:nth-child(2) { animation-delay: 0.2s; }
-		.features-grid .feature-card:nth-child(3) { animation-delay: 0.3s; }
-		.features-grid .feature-card:nth-child(4) { animation-delay: 0.4s; }
-		.features-grid .feature-card:nth-child(5) { animation-delay: 0.5s; }
-		.features-grid .feature-card:nth-child(6) { animation-delay: 0.6s; }
 	</style>
 </head>
 <body>
+	<div class="bg-grid"></div>
 	<div class="bg-glow"></div>
 
 	<header>
 		<div class="container">
 			<nav>
-				<div class="logo">
-					<div class="logo-icon">⟩</div>
-					<span>TIDE</span>
-				</div>
+				<a href="#" class="logo" style="text-decoration: none; color: inherit;">
+					<div class="logo-icon">🌊</div>
+					<span>Tide OS</span>
+				</a>
 				<ul class="nav-links">
+					<li><a href="#what">What</a></li>
 					<li><a href="#features">Features</a></li>
 					<li><a href="#install">Install</a></li>
-					<li><a href="https://github.com/can1357/oh-my-pi" target="_blank" rel="noopener">GitHub</a></li>
+					<li>
+						<button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme" title="Toggle theme">
+							<svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+							<svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+						</button>
+					</li>
+					<li>
+						<a href="https://github.com/SnoozeScript/tide-os" target="_blank" rel="noopener" class="github-link">
+							<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+								<path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/>
+							</svg>
+							GitHub
+						</a>
+					</li>
 				</ul>
 			</nav>
 		</div>
@@ -518,22 +1211,132 @@
 
 	<section class="hero">
 		<div class="container">
-			<h1>Intelligence-Driven<span>Engine for Terminal</span></h1>
-			<p>TIDE is a powerful CLI tool that brings AI-powered coding assistance directly to your terminal. Built with Bun, powered by LLMs, designed for developers.</p>
+			<div class="pill"><span class="dot"></span>v0.0.2 · AI Coding Harness · Early Access</div>
+			<h1><pre class="brand-main">████████╗██╗██████╗ ███████╗
+╚══██╔══╝██║██╔══██╗██╔════╝
+   ██║   ██║██║  ██║█████╗
+   ██║   ██║██║  ██║██╔══╝
+   ██║   ██║██████╔╝███████╗
+   ╚═╝   ╚═╝╚═════╝ ╚══════╝</pre><span class="brand-sub"><b>T</b>erminal <b>I</b>ntelligence <b>D</b>evelopment <b>E</b>ngine</span></h1>
+			<p class="sub">An AI coding harness built for the terminal  scaffolding around LLMs with real tool use, session memory, and multi-provider model support. Run it as a CLI, or boot it as a live Linux OS.</p>
+			<div class="hero-chips">
+				<div class="chip"><kbd>⌃P</kbd>Switch model</div>
+				<div class="chip"><kbd>⌃R</kbd>Resume session</div>
+				<div class="chip"><kbd>/</kbd>Commands</div>
+				<div class="chip"><kbd>!</kbd>Run bash</div>
+			</div>
 			<div class="cta-group">
-				<a href="#install" class="btn btn-primary">Install Now →</a>
-				<a href="#features" class="btn btn-secondary">Learn More</a>
+				<a href="#install" class="btn btn-primary">Get Started →</a>
+				<a href="https://github.com/SnoozeScript/tide-os/releases" target="_blank" rel="noopener" class="btn btn-secondary">Download ISO</a>
 			</div>
 
-			<div class="demo" id="demo">
+			<div class="demo">
 				<div class="demo-header">
 					<div class="demo-dot red"></div>
 					<div class="demo-dot yellow"></div>
 					<div class="demo-dot green"></div>
-					<span style="margin-left: auto; color: var(--text-secondary); font-size: 12px;">tide — bash</span>
+					<span class="demo-title">tide@tide-os ~ /workspace</span>
 				</div>
-				<div class="demo-content" id="demo-content">
-					<!-- Typing animation handled by JS -->
+				<div class="demo-content">
+					<div class="tui-stage">
+						<div class="tui-view" id="tui-view-welcome">
+							<div class="tui-frame">
+								<div class="tui-body">
+									<div class="tui-col-left">
+										<div class="tui-welcome">Welcome to Tide</div>
+										<pre class="tui-logo">████████╗██╗██████╗ ███████╗
+╚══██╔══╝██║██╔══██╗██╔════╝
+   ██║   ██║██║  ██║█████╗
+   ██║   ██║██║  ██║██╔══╝
+   ██║   ██║██████╔╝███████╗
+   ╚═╝   ╚═╝╚═════╝ ╚══════╝</pre>
+										<div class="tui-cli-label">CLI</div>
+										<div class="tui-wave">~ ~ ~ 🌊 ~ ~ ~</div>
+										<div class="tui-model">Claude Sonnet 4.6</div>
+										<div class="tui-provider">anthropic</div>
+									</div>
+									<div class="tui-col-right">
+										<div class="tui-section">
+											<div class="tui-section-title">Tips</div>
+											<ul class="tui-list">
+												<li><span class="tui-key">?</span>for keyboard shortcuts</li>
+												<li><span class="tui-key">/</span>for commands</li>
+												<li><span class="tui-key">!</span>to run bash</li>
+												<li><span class="tui-key">$</span>to run python</li>
+											</ul>
+										</div>
+										<hr class="tui-divider">
+										<div class="tui-section">
+											<div class="tui-section-title">LSP Servers</div>
+											<ul class="tui-list">
+												<li><span class="session-bullet">●</span><span style="color: var(--text-main);">rust-analyzer</span> <span class="session-time">.rs</span></li>
+											</ul>
+										</div>
+										<hr class="tui-divider">
+										<div class="tui-section">
+											<div class="tui-section-title">Recent sessions</div>
+											<ul class="tui-list">
+												<li><span class="session-bullet">•</span><span class="session-name">Refactor retry logic</span> <span class="session-time">(18h ago)</span></li>
+												<li><span class="session-bullet">•</span><span class="session-name">Fix auth middleware</span> <span class="session-time">(2d ago)</span></li>
+												<li><span class="session-bullet">•</span><span class="session-name">New Coding Session</span> <span class="session-time">(2d ago)</span></li>
+											</ul>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="tui-update">
+								<div class="tui-update-title">Update Available</div>
+								<div class="tui-update-body">New version 0.0.3 is available. Run: <code>tide update</code></div>
+							</div>
+						</div>
+
+						<div class="tui-view" id="tui-view-session" hidden>
+							<div class="tui-session" id="tui-session"></div>
+						</div>
+					</div>
+
+					<div class="tui-prompt-bar">
+						<span>🌊</span><span class="sep">›</span>
+						<span class="cyan">Claude Sonnet 4.6</span><span class="sep">›</span>
+						<span class="cyan">main</span><span class="sep">›</span>
+						<span id="tui-prompt-text" style="color: var(--text-main);"></span>
+						<span class="cursor"></span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="paths" id="what">
+		<div class="container">
+			<div class="section-heading">
+				<h2>Two ways to use it</h2>
+				<p>Run Tide as a CLI in your existing environment, or boot a dedicated OS with the agent waiting for you on login.</p>
+			</div>
+			<div class="paths-grid">
+				<div class="path-card">
+					<div class="label">Option 1 — CLI</div>
+					<h3>Tide CLI</h3>
+					<p>A fast terminal coding agent that runs locally on your machine. Works with your existing projects, editors, and shell.</p>
+					<ul>
+						<li>Interactive TUI with streaming responses</li>
+						<li>Multi-provider: Claude, ChatGPT, Copilot, Gemini, Cursor, OpenRouter, Perplexity, and more</li>
+						<li>Native tool integration: git, bash, file ops, LSP, Python</li>
+						<li>Session persistence & resume</li>
+					</ul>
+					<a href="#install" class="btn btn-secondary">Install CLI</a>
+				</div>
+				<div class="path-card">
+					<div class="label">Option 2 — OS</div>
+					<h3>Tide OS (Live ISO)</h3>
+					<p>A bootable Debian-based live Linux environment with the Tide agent pre-installed and auto-launched on login. Boot from USB, run in a VM.</p>
+					<ul>
+						<li>~1 GB live ISO with UEFI + BIOS boot</li>
+						<li>Auto-login as <code style="font-family: 'Geist Mono', 'JetBrains Mono', ui-monospace, monospace; color: var(--text-main);">tide</code> user</li>
+						<li>Bun runtime + agent pre-installed at <code style="font-family: 'Geist Mono', 'JetBrains Mono', ui-monospace, monospace; color: var(--text-main);">/opt/tide-os</code></li>
+						<li>Run the agent just by typing <code style="font-family: 'Geist Mono', 'JetBrains Mono', ui-monospace, monospace; color: var(--text-main);">tide</code></li>
+					</ul>
+					<a href="https://github.com/SnoozeScript/tide-os/releases" target="_blank" rel="noopener" class="btn btn-secondary">Download ISO</a>
 				</div>
 			</div>
 		</div>
@@ -541,63 +1344,81 @@
 
 	<section class="features" id="features">
 		<div class="container">
-			<h2>Why TIDE?</h2>
+			<div class="section-heading">
+				<h2>Built for real engineering work</h2>
+				<p>Not a chat window. A terminal-native agent that reads, writes, runs, and understands your code.</p>
+			</div>
 			<div class="features-grid">
 				<div class="feature-card">
 					<div class="feature-icon">⚡</div>
-					<h3>Blazing Fast</h3>
-					<p>Engineered with Bun and Rust for near-instant performance in any environment.</p>
+					<h3>Fast by design</h3>
+					<p>Bun runtime for instant startup. Rust bindings for grep, PTY, and image ops where it matters.</p>
 				</div>
 				<div class="feature-card">
-					<div class="feature-icon">🖥️</div>
-					<h3>Terminal First</h3>
-					<p>A sophisticated TUI that replaces complex web interfaces with raw terminal power.</p>
+					<div class="feature-icon">⌨</div>
+					<h3>Terminal-native</h3>
+					<p>Custom TUI with differential rendering, streaming output, and keyboard-first navigation.</p>
 				</div>
 				<div class="feature-card">
-					<div class="feature-icon">🔗</div>
-					<h3>Provider Agnostic</h3>
-					<p>Connect to OpenAI, Anthropic, or local LLMs. Your keys, your choice, your control.</p>
+					<div class="feature-icon">🔌</div>
+					<h3>Provider agnostic</h3>
+					<p>Bring your own key. Switch models with Ctrl+P. Works with 40+ models across cloud and local providers.</p>
 				</div>
 				<div class="feature-card">
-					<div class="feature-icon">🧠</div>
-					<h3>Autonomous</h3>
-					<p>Not just a chat box. TIDE understands project architecture and executes complex tasks.</p>
+					<div class="feature-icon">🛠</div>
+					<h3>Real tool use</h3>
+					<p>Bash, git, file edits, LSP diagnostics, Python kernel, web search. Planned actions, transparent execution.</p>
 				</div>
 				<div class="feature-card">
-					<div class="feature-icon">🔧</div>
-					<h3>Tool Native</h3>
-					<p>Deep integration with git, shell, and file systems. It doesn't just suggest; it builds.</p>
+					<div class="feature-icon">💾</div>
+					<h3>Sessions & resume</h3>
+					<p>Every session is saved. Pick up where you left off with <code style="font-family: 'Geist Mono', 'JetBrains Mono', ui-monospace, monospace; font-size: 13px;">--continue</code> or <code style="font-family: 'Geist Mono', 'JetBrains Mono', ui-monospace, monospace; font-size: 13px;">--resume</code>.</p>
 				</div>
 				<div class="feature-card">
 					<div class="feature-icon">📊</div>
 					<h3>Observable</h3>
-					<p>Full transparency with built-in analytics for token usage, latency, and cost tracking.</p>
+					<p>Built-in stats dashboard tracks tokens, latency, and cost across every session and provider.</p>
 				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="providers">
+		<div class="container">
+			<p class="providers-label">Works with your favorite models</p>
+		</div>
+		<div class="marquee">
+			<div class="marquee-track" id="marquee-track">
+				<!-- filled by JS (duplicated for seamless loop) -->
+			</div>
 		</div>
 	</section>
 
 	<section class="install" id="install">
 		<div class="container">
-			<h2>Get Started</h2>
+			<div class="section-heading">
+				<h2>Install the CLI</h2>
+				<p>Currently distributed via source. Binary releases on each tag — check GitHub Releases.</p>
+			</div>
 			<div class="install-commands">
 				<div class="install-cmd">
-					<div class="install-label">macOS / Linux</div>
+					<div class="install-label">Clone & run with Bun (recommended)</div>
 					<div class="install-row">
-						<span class="install-code">curl -fsSL https://oh-my-pi.dev/install | bash</span>
+						<span class="install-code">git clone https://github.com/SnoozeScript/tide-os &amp;&amp; cd tide-os &amp;&amp; bun install &amp;&amp; bun run dev</span>
 						<button class="install-copy" onclick="copyCmd(this)">Copy</button>
 					</div>
 				</div>
 				<div class="install-cmd">
-					<div class="install-label">Bun</div>
+					<div class="install-label">Pre-built Linux binary</div>
 					<div class="install-row">
-						<span class="install-code">bunx @oh-my-pi/coding-agent</span>
+						<span class="install-code">curl -fsSL https://github.com/SnoozeScript/tide-os/releases/latest/download/omp-linux-x64 -o omp &amp;&amp; chmod +x omp</span>
 						<button class="install-copy" onclick="copyCmd(this)">Copy</button>
 					</div>
 				</div>
 				<div class="install-cmd">
-					<div class="install-label">npm</div>
+					<div class="install-label">Bootable live ISO</div>
 					<div class="install-row">
-						<span class="install-code">npm install -g @oh-my-pi/coding-agent</span>
+						<span class="install-code">Download tide-os.iso from GitHub Releases → boot from USB or QEMU</span>
 						<button class="install-copy" onclick="copyCmd(this)">Copy</button>
 					</div>
 				</div>
@@ -605,90 +1426,202 @@
 		</div>
 	</section>
 
-	<section class="tech" id="tech">
+	<section class="tech">
 		<div class="container">
-			<h2>Built with</h2>
+			<p class="tech-label">Built with</p>
 			<div class="tech-logos">
 				<span class="tech-item">Bun</span>
 				<span class="tech-item">TypeScript</span>
 				<span class="tech-item">Rust</span>
 				<span class="tech-item">N-API</span>
+				<span class="tech-item">Debian</span>
+				<span class="tech-item">systemd-live</span>
 			</div>
 		</div>
 	</section>
 
 	<footer>
 		<div class="container">
-			<p>Open source · <a href="https://github.com/can1357/oh-my-pi" target="_blank" rel="noopener">GitHub</a></p>
+			<div class="footer-links">
+				<a href="https://github.com/SnoozeScript/tide-os" target="_blank" rel="noopener">GitHub</a>
+				<a href="https://github.com/SnoozeScript/tide-os/releases" target="_blank" rel="noopener">Releases</a>
+				<a href="https://github.com/SnoozeScript/tide-os/issues" target="_blank" rel="noopener">Issues</a>
+				<a href="https://github.com/SnoozeScript/tide-os/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
+			</div>
+			<p>Open source · Made with Bun &amp; Rust</p>
 		</div>
 	</footer>
 
 	<script>
-		// Typing animation
-		const demoLines = [
-			{ text: '$ tide "create a REST API with Express"', type: 'prompt' },
-			{ text: '🤖 Analyzing project structure...', type: 'output' },
-			{ text: '✓ Created server.ts', type: 'output' },
-			{ text: '✓ Created routes/users.ts', type: 'output' },
-			{ text: '✓ Created middleware/auth.ts', type: 'output' },
-			{ text: 'Done! 3 files created in 0.4s', type: 'highlight' }
+		function toggleTheme() {
+			const current = document.documentElement.getAttribute('data-theme');
+			const next = current === 'dark' ? 'light' : 'dark';
+			document.documentElement.setAttribute('data-theme', next);
+			localStorage.setItem('theme', next);
+		}
+
+		// === Animated TUI demo ===
+		const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+		const demoScript = [
+			{ kind: 'user', text: 'add retry logic to src/api/client.ts' },
+			{ kind: 'thought', text: "Reading the file to understand the current fetch usage…" },
+			{ kind: 'tool', icon: '⊘', label: 'Read', body: 'src/api/client.ts' },
+			{ kind: 'thought', text: "Found 2 fetch calls. I'll wrap them with an exponential-backoff retry helper." },
+			{ kind: 'tool', icon: '⊘', label: 'Create', body: 'src/api/retry.ts' },
+			{ kind: 'diff', lines: [
+				{ op: '+', text: "export async function retry<T>(" },
+				{ op: '+', text: "  fn: () => Promise<T>," },
+				{ op: '+', text: "  opts = { max: 3, baseMs: 200 }," },
+				{ op: '+', text: ") {" },
+				{ op: '+', text: "  // respects Retry-After, exponential backoff" },
+				{ op: '+', text: "}" },
+			]},
+			{ kind: 'tool', icon: '⊘', label: 'Edit', body: 'src/api/client.ts' },
+			{ kind: 'diff', lines: [
+				{ op: 'meta', text: "@@ line 14 @@" },
+				{ op: '+', text: "import { retry } from './retry';" },
+				{ op: 'meta', text: "@@ line 28 @@" },
+				{ op: '-', text: "  const res = await fetch(url);" },
+				{ op: '+', text: "  const res = await retry(() => fetch(url));" },
+			]},
+			{ kind: 'tool', icon: '⊘', label: 'Bash', body: 'bun test src/api' },
+			{ kind: 'output', text: "✓ retries on 429\n✓ respects Retry-After header\n✓ gives up after max attempts\n14 pass · 0 fail · 120ms" },
+			{ kind: 'done', text: '✔ Done · 2 files changed · 4.2k tokens · $0.018' },
 		];
 
-		const demoContent = document.getElementById('demo-content');
-		let lineIndex = 0;
-		let charIndex = 0;
-		let currentLine = null;
-		let cursorSpan = null;
-
-		function typeLine() {
-			if (lineIndex >= demoLines.length) return;
-
-			const line = demoLines[lineIndex];
-
-			if (!currentLine) {
-				currentLine = document.createElement('div');
-				currentLine.className = 'demo-line';
-				const numSpan = document.createElement('span');
-				numSpan.className = 'number';
-				numSpan.textContent = lineIndex + 1;
-				currentLine.appendChild(numSpan);
-				const textSpan = document.createElement('span');
-				textSpan.className = line.type === 'prompt' ? 'prompt' : line.type === 'highlight' ? 'output highlight' : 'output';
-				currentLine.appendChild(textSpan);
-				cursorSpan = document.createElement('span');
-				cursorSpan.className = 'typing-cursor';
-				currentLine.appendChild(cursorSpan);
-				demoContent.appendChild(currentLine);
-			}
-
-			const textSpan = currentLine.querySelector('span:last-child');
-
-			if (charIndex < line.text.length) {
-				textSpan.textContent = line.text.substring(0, charIndex + 1);
-				charIndex++;
-				setTimeout(typeLine, 30 + Math.random() * 40);
-			} else {
-				cursorSpan.remove();
-				cursorSpan = null;
-				lineIndex++;
-				charIndex = 0;
-				currentLine = null;
-				setTimeout(typeLine, 200);
+		async function typePrompt(text, speed = 38) {
+			const el = document.getElementById('tui-prompt-text');
+			el.textContent = '';
+			for (const ch of text) {
+				el.textContent += ch;
+				await sleep(speed + Math.random() * 30);
 			}
 		}
 
-		// Start typing after page loads
-		setTimeout(typeLine, 1000);
+		function appendSession(html) {
+			const session = document.getElementById('tui-session');
+			const div = document.createElement('div');
+			div.className = 'session-msg';
+			div.innerHTML = html;
+			session.appendChild(div);
+			session.scrollTop = session.scrollHeight;
+		}
 
-		// Copy command
+		function renderStep(step) {
+			switch (step.kind) {
+				case 'user':
+					return `<div class="session-user">${step.text}</div>`;
+				case 'thought':
+					return `<div class="session-thought">${step.text}</div>`;
+				case 'tool':
+					return `<div class="session-tool"><span class="tool-icon">${step.icon}</span><span class="tool-label">${step.label}</span><span class="tool-body">${step.body}</span></div>`;
+				case 'diff': {
+					const lines = step.lines.map(l => {
+						if (l.op === '+') return `<span class="diff-line diff-add">+ ${l.text}</span>`;
+						if (l.op === '-') return `<span class="diff-line diff-del">- ${l.text}</span>`;
+						return `<span class="diff-line diff-meta">${l.text}</span>`;
+					}).join('');
+					return `<div class="session-diff">${lines}</div>`;
+				}
+				case 'output':
+					return `<div class="session-output">${step.text}</div>`;
+				case 'done':
+					return `<div class="session-done">${step.text}</div>`;
+			}
+			return '';
+		}
+
+		async function runDemo() {
+			const welcome = document.getElementById('tui-view-welcome');
+			const sessionView = document.getElementById('tui-view-session');
+			const session = document.getElementById('tui-session');
+
+			while (true) {
+				// Reset
+				welcome.hidden = false;
+				sessionView.hidden = true;
+				session.innerHTML = '';
+				document.getElementById('tui-prompt-text').textContent = '';
+
+				// Pause on welcome
+				await sleep(2000);
+
+				// Type the prompt
+				await typePrompt('add retry logic to src/api/client.ts');
+				await sleep(600);
+
+				// Switch to session view
+				welcome.hidden = true;
+				sessionView.hidden = false;
+				document.getElementById('tui-prompt-text').textContent = '';
+
+				// Stream each step
+				for (const step of demoScript) {
+					appendSession(renderStep(step));
+					let delay = 500;
+					if (step.kind === 'thought') delay = 700;
+					if (step.kind === 'tool') delay = 450;
+					if (step.kind === 'diff') delay = 900;
+					if (step.kind === 'output') delay = 800;
+					if (step.kind === 'done') delay = 0;
+					await sleep(delay);
+				}
+
+				// Pause on completed session
+				await sleep(4000);
+			}
+		}
+
+		// Start demo when visible (respects reduced-motion)
+		if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+			const demoSection = document.querySelector('.demo');
+			if ('IntersectionObserver' in window && demoSection) {
+				const io = new IntersectionObserver((entries) => {
+					if (entries[0].isIntersecting) {
+						io.disconnect();
+						runDemo();
+					}
+				}, { threshold: 0.2 });
+				io.observe(demoSection);
+			} else {
+				runDemo();
+			}
+		}
+
 		function copyCmd(btn) {
 			const code = btn.parentElement.querySelector('.install-code').textContent;
-			navigator.clipboard.writeText(code);
-			btn.textContent = 'Copied!';
-			setTimeout(() => btn.textContent = 'Copy', 1500);
+			navigator.clipboard.writeText(code).then(() => {
+				btn.textContent = 'Copied';
+				btn.classList.add('copied');
+				setTimeout(() => {
+					btn.textContent = 'Copy';
+					btn.classList.remove('copied');
+				}, 1500);
+			});
 		}
 
-		// Feature card mouse tracking
+		// Populate provider marquee (twice, for seamless infinite loop)
+		const providers = [
+			'Anthropic Claude',
+			'ChatGPT Plus/Pro',
+			'Kimi Code',
+			'GitHub Copilot',
+			'Google Code Assist',
+			'Antigravity',
+			'Cursor',
+			'OpenCode Zen',
+			'OpenRouter',
+			'Z.AI (GLM)',
+			'MiniMax',
+			'Perplexity Pro',
+		];
+		const marqueeTrack = document.getElementById('marquee-track');
+		const buildItems = () => providers.map(p =>
+			`<div class="marquee-item"><span class="dot"></span>${p}</div>`
+		).join('');
+		marqueeTrack.innerHTML = buildItems() + buildItems();
+
 		document.querySelectorAll('.feature-card').forEach(card => {
 			card.addEventListener('mousemove', (e) => {
 				const rect = card.getBoundingClientRect();
