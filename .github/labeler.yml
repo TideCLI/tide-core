@@ -1,0 +1,61 @@
+# Path-based PR labels — used by .github/workflows/label-pr.yml
+
+rust:
+  - changed-files:
+      - any-glob-to-any-file: "crates/**"
+      - any-glob-to-any-file: "Cargo.*"
+
+typescript:
+  - changed-files:
+      - any-glob-to-any-file: "packages/**/*.ts"
+      - any-glob-to-any-file: "tsconfig*.json"
+
+cli:
+  - changed-files:
+      - any-glob-to-any-file: "packages/coding-agent/**"
+
+tui:
+  - changed-files:
+      - any-glob-to-any-file: "packages/tui/**"
+
+ai:
+  - changed-files:
+      - any-glob-to-any-file: "packages/ai/**"
+
+agent-core:
+  - changed-files:
+      - any-glob-to-any-file: "packages/agent/**"
+
+natives:
+  - changed-files:
+      - any-glob-to-any-file: "packages/natives/**"
+      - any-glob-to-any-file: "crates/**"
+
+stats:
+  - changed-files:
+      - any-glob-to-any-file: "packages/stats/**"
+
+iso:
+  - changed-files:
+      - any-glob-to-any-file: "scripts/build-iso.sh"
+
+ci:
+  - changed-files:
+      - any-glob-to-any-file: ".github/**"
+
+docs:
+  - changed-files:
+      - any-glob-to-any-file: "**/*.md"
+
+dependencies:
+  - changed-files:
+      - any-glob-to-any-file: "package.json"
+      - any-glob-to-any-file: "bun.lock"
+      - any-glob-to-any-file: "Cargo.lock"
+      - any-glob-to-any-file: "**/package.json"
+
+config:
+  - changed-files:
+      - any-glob-to-any-file: "biome.json"
+      - any-glob-to-any-file: "bunfig.toml"
+      - any-glob-to-any-file: "tsconfig*.json"
