@@ -151,12 +151,16 @@ rsync -a --exclude='node_modules' \
          "${PROJECT_DIR}/" "${CHROOT_DIR}/opt/tide-os/"
 
 chroot "${CHROOT_DIR}" /bin/bash -c "
+    set -e
     export HOME=/root
     export PATH=\"/opt/bun/bin:\$PATH\"
     cd /opt/tide-os
-    bun install --production 2>/dev/null || bun install 2>/dev/null || true
+    # Install deps. --production first (smaller ISO); fall back to full install if
+    # workspace resolution requires dev deps. Errors are NOT masked — a failed
+    # install here produces a broken live system, so we must fail loud.
+    bun install --production || bun install
     chmod -R a+rX /opt/tide-os
-"
+" || { err 'bun install failed inside chroot — aborting ISO build'; exit 1; }
 
 # ─── Step 6: Configure Tide OS branding & auto-login ─────────────────────────
 log "Configuring Tide OS branding..."
@@ -224,6 +228,9 @@ cd /opt/tide-os
 exec bun packages/coding-agent/src/cli.ts "$@"
 TIDECMD
 chmod +x "${CHROOT_DIR}/usr/local/bin/tide"
+
+# 'omp' alias — keeps upstream muscle memory working
+ln -sf tide "${CHROOT_DIR}/usr/local/bin/omp"
 
 # Create a custom neofetch-like info command
 cat > "${CHROOT_DIR}/usr/local/bin/tide-info" <<'TIDEINFO'
