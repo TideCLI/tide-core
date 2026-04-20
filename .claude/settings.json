@@ -3,7 +3,8 @@
     "allow": [
       "Bash(bunx tsgo *)",
       "Bash(python3 -c ' *)",
-      "Bash(bun run *)"
+      "Bash(bun run *)",
+      "Bash(bash -n /home/snoozescript/workspace/snoozescript/tide-os/scripts/build-iso.sh)"
     ]
   }
 }

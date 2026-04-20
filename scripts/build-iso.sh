@@ -87,6 +87,7 @@ mount -t sysfs sys "${CHROOT_DIR}/sys"
 # ─── Step 3: Install packages inside chroot ──────────────────────────────────
 log "Installing base system packages..."
 chroot "${CHROOT_DIR}" /bin/bash -c "
+    set -e
     export DEBIAN_FRONTEND=noninteractive
     apt-get update -qq
     apt-get install -y --no-install-recommends \
@@ -105,7 +106,6 @@ chroot "${CHROOT_DIR}" /bin/bash -c "
         bash \
         vim-tiny \
         htop \
-        neofetch \
         openssh-client \
         iproute2 \
         iputils-ping \
@@ -129,6 +129,7 @@ chroot "${CHROOT_DIR}" /bin/bash -c "
 # ─── Step 4: Install Bun runtime ─────────────────────────────────────────────
 log "Installing Bun runtime..."
 chroot "${CHROOT_DIR}" /bin/bash -c "
+    set -e
     mkdir -p /opt/bun
     export BUN_INSTALL=/opt/bun
     export HOME=/root
@@ -263,7 +264,6 @@ echo ""
 echo -e "  \033[1mgit\033[0m             Version control"
 echo -e "  \033[1mvim\033[0m             Text editor (vim-tiny)"
 echo -e "  \033[1mhtop\033[0m            Process monitor"
-echo -e "  \033[1mneofetch\033[0m        System info display"
 echo -e "  \033[1mpython3\033[0m         Python interpreter"
 echo ""
 TIDEHELP
@@ -272,7 +272,8 @@ chmod +x "${CHROOT_DIR}/usr/local/bin/tide-help"
 # ─── Step 7: Create user and configure auto-login ────────────────────────────
 log "Setting up user and auto-login..."
 chroot "${CHROOT_DIR}" /bin/bash -c "
-    # Create tide user
+    set -e
+    # Create tide user (ok if already present)
     useradd -m -s /bin/bash -G sudo tide 2>/dev/null || true
     echo 'tide:tide' | chpasswd
     echo 'root:tide' | chpasswd
