@@ -58,7 +58,7 @@ mkdir -p "${CHROOT_DIR}" "${ISO_DIR}"/{boot/grub,live,isolinux,.disk}
 
 # ─── Step 1: Bootstrap minimal Debian system ─────────────────────────────────
 log "Bootstrapping minimal Debian system (this may take a few minutes)..."
-debootstrap --arch=amd64 --variant=minbase bookworm "${CHROOT_DIR}" http://deb.debian.org/debian
+debootstrap --arch=amd64 --variant=minbase trixie "${CHROOT_DIR}" http://deb.debian.org/debian
 
 # ─── Step 2: Configure the chroot ───────────────────────────────────────────
 log "Configuring chroot environment..."
@@ -73,9 +73,9 @@ EOF
 
 # Configure APT sources
 cat > "${CHROOT_DIR}/etc/apt/sources.list" <<EOF
-deb http://deb.debian.org/debian bookworm main contrib non-free non-free-firmware
-deb http://deb.debian.org/debian bookworm-updates main contrib non-free non-free-firmware
-deb http://security.debian.org/debian-security bookworm-security main contrib non-free non-free-firmware
+deb http://deb.debian.org/debian trixie main contrib non-free non-free-firmware
+deb http://deb.debian.org/debian trixie-updates main contrib non-free non-free-firmware
+deb http://security.debian.org/debian-security trixie-security main contrib non-free non-free-firmware
 EOF
 
 # Mount required filesystems for chroot
