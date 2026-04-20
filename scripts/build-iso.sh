@@ -107,6 +107,7 @@ chroot "${CHROOT_DIR}" /bin/bash -c "
         vim-tiny \
         htop \
         openssh-client \
+        openssh-server \
         iproute2 \
         iputils-ping \
         net-tools \
@@ -288,6 +289,9 @@ chroot "${CHROOT_DIR}" /bin/bash -c "
     # Allow tide user to sudo without password
     echo 'tide ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/tide
     chmod 440 /etc/sudoers.d/tide
+
+    # Enable SSH so users can connect from the host terminal
+    systemctl enable ssh 2>/dev/null || true
 "
 
 # Setup auto-login on tty1
