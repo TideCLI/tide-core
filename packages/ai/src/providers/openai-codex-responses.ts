@@ -327,7 +327,7 @@ export const streamOpenAICodexResponses: StreamFunction<"openai-codex-responses"
 			const messages = convertMessages(model, context);
 			const params: RequestBody = {
 				model: model.id,
-				input: messages,
+				input: messages as unknown as InputItem[],
 				stream: true,
 				prompt_cache_key: options?.sessionId,
 			};

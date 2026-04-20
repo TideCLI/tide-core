@@ -17,11 +17,10 @@ import type { ReadonlySessionManager } from "../../session/session-manager";
 /** Alias for clarity */
 export type CustomToolUIContext = HookUIContext;
 
-/** Re-export for custom tools to use in execute signature */
-export type { AgentToolResult, AgentToolUpdateCallback };
-
 // Re-export for backward compatibility
 export type { ExecOptions, ExecResult } from "../../exec/exec";
+/** Re-export for custom tools to use in execute signature */
+export type { AgentToolResult, AgentToolUpdateCallback };
 
 /** API passed to custom tool factory (stable across session changes) */
 export interface CustomToolAPI {

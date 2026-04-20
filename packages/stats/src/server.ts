@@ -1,6 +1,6 @@
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
-import postcss from "postcss";
+import postcss, { type AcceptedPlugin } from "postcss";
 import tailwindcss from "tailwindcss";
 import {
 	getDashboardStats,
@@ -16,9 +16,10 @@ const STATIC_DIR = path.join(import.meta.dir, "..", "dist", "client");
 
 async function buildTailwindCss(inputPath: string, outputPath: string): Promise<void> {
 	const sourceCss = await Bun.file(inputPath).text();
-	const result = await postcss([
-		tailwindcss({ config: path.join(import.meta.dir, "..", "tailwind.config.js") }),
-	]).process(sourceCss, {
+	const plugins: AcceptedPlugin[] = [
+		tailwindcss({ config: path.join(import.meta.dir, "..", "tailwind.config.js") }) as AcceptedPlugin,
+	];
+	const result = await postcss(plugins).process(sourceCss, {
 		from: inputPath,
 		to: outputPath,
 	});
