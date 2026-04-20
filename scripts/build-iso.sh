@@ -43,7 +43,7 @@ if [[ $EUID -ne 0 ]]; then
     exit 1
 fi
 
-for cmd in debootstrap mksquashfs xorriso grub-mkstandalone; do
+for cmd in debootstrap mksquashfs xorriso grub-mkstandalone rsync mkfs.vfat mcopy; do
     if ! command -v "$cmd" &>/dev/null; then
         err "Missing required command: $cmd"
         echo "Install with: sudo apt-get install -y debootstrap squashfs-tools xorriso grub-efi-amd64-bin grub-common"
@@ -129,11 +129,13 @@ chroot "${CHROOT_DIR}" /bin/bash -c "
 # ─── Step 4: Install Bun runtime ─────────────────────────────────────────────
 log "Installing Bun runtime..."
 chroot "${CHROOT_DIR}" /bin/bash -c "
+    mkdir -p /opt/bun
+    export BUN_INSTALL=/opt/bun
     export HOME=/root
     curl -fsSL https://bun.sh/install | bash
-    # Ensure bun is in PATH for all users
-    ln -sf /root/.bun/bin/bun /usr/local/bin/bun
-    ln -sf /root/.bun/bin/bunx /usr/local/bin/bunx
+    ln -sf /opt/bun/bin/bun /usr/local/bin/bun
+    ln -sf /opt/bun/bin/bunx /usr/local/bin/bunx
+    chmod -R a+rX /opt/bun
 "
 
 # ─── Step 5: Copy and install Tide OS agent ──────────────────────────────────
@@ -149,9 +151,10 @@ rsync -a --exclude='node_modules' \
 
 chroot "${CHROOT_DIR}" /bin/bash -c "
     export HOME=/root
-    export PATH=\"/root/.bun/bin:\$PATH\"
+    export PATH=\"/opt/bun/bin:\$PATH\"
     cd /opt/tide-os
     bun install --production 2>/dev/null || bun install 2>/dev/null || true
+    chmod -R a+rX /opt/tide-os
 "
 
 # ─── Step 6: Configure Tide OS branding & auto-login ─────────────────────────
@@ -215,7 +218,7 @@ ISSUE
 # Create the 'tide' launcher command
 cat > "${CHROOT_DIR}/usr/local/bin/tide" <<'TIDECMD'
 #!/usr/bin/env bash
-export PATH="/root/.bun/bin:$PATH"
+export PATH="/opt/bun/bin:$PATH"
 cd /opt/tide-os
 exec bun packages/coding-agent/src/cli.ts "$@"
 TIDECMD
@@ -287,11 +290,11 @@ ExecStart=
 ExecStart=-/sbin/agetty --autologin tide --noclear %I \$TERM
 EOF
 
-# Auto-display info on login
-cat >> "${CHROOT_DIR}/home/tide/.bashrc" 2>/dev/null || cat >> "${CHROOT_DIR}/root/.bashrc" <<'BASHRC'
+# Auto-display info on login — append to both root and tide bashrc
+TIDE_BASHRC_SNIPPET=$(cat <<'BASHRC'
 
 # Tide OS customization
-export PATH="/root/.bun/bin:/usr/local/bin:$PATH"
+export PATH="/opt/bun/bin:/usr/local/bin:$PATH"
 alias help='tide-help'
 alias info='tide-info'
 
@@ -301,11 +304,12 @@ if [ -z "$TIDE_WELCOMED" ]; then
     tide-info
 fi
 BASHRC
+)
 
-# Ensure the bashrc is also for the tide user
-if [ -d "${CHROOT_DIR}/home/tide" ]; then
-    cp "${CHROOT_DIR}/root/.bashrc" "${CHROOT_DIR}/home/tide/.bashrc" 2>/dev/null || true
-    chroot "${CHROOT_DIR}" chown tide:tide /home/tide/.bashrc 2>/dev/null || true
+echo "$TIDE_BASHRC_SNIPPET" >> "${CHROOT_DIR}/root/.bashrc"
+if [ -f "${CHROOT_DIR}/home/tide/.bashrc" ]; then
+    echo "$TIDE_BASHRC_SNIPPET" >> "${CHROOT_DIR}/home/tide/.bashrc"
+    chroot "${CHROOT_DIR}" chown tide:tide /home/tide/.bashrc
 fi
 
 # ─── Step 8: Clean up chroot & unmount ───────────────────────────────────────
@@ -399,7 +403,7 @@ grub-mkstandalone \
     --output="${WORK_DIR}/bootx64.efi" \
     --locales="" \
     --fonts="" \
-    --modules="part_gpt part_msdos fat iso9660 loopback normal configfile search search_label search_fs_uuid search_fs_file linux linuxefi echo all_video gfxterm gfxmenu efi_gop efi_uga video boot chain reboot halt test ls cat help" \
+    --modules="part_gpt part_msdos fat iso9660 loopback normal configfile search search_label search_fs_uuid search_fs_file linux echo all_video gfxterm gfxmenu efi_gop efi_uga video boot chain reboot halt test ls cat help" \
     "boot/grub/grub.cfg=${WORK_DIR}/embed.cfg"
 
 # Create FAT EFI system partition image
