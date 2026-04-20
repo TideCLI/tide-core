@@ -1,399 +1,134 @@
+<h1 align="center">🌊 Tide OS</h1>
+
 <p align="center">
-  <img src="https://github.com/can1357/oh-my-pi/blob/main/assets/hero.png?raw=true" alt="Pi Monorepo">
+  <strong>Terminal Intelligence Development Engine</strong><br>
+  An AI coding harness for your terminal — available as a CLI or a bootable live Linux ISO.
 </p>
 
 <p align="center">
-  <strong>AI coding agent for the terminal</strong>
+  <a href="https://github.com/SnoozeScript/tide-os/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/SnoozeScript/tide-os/ci.yml?branch=main&style=flat&colorA=0b1a2e&colorB=22d3ee&label=CI" alt="CI"></a>
+  <a href="https://github.com/SnoozeScript/tide-os/releases"><img src="https://img.shields.io/github/v/release/SnoozeScript/tide-os?include_prereleases&style=flat&colorA=0b1a2e&colorB=22d3ee&label=release" alt="Release"></a>
+  <a href="https://github.com/SnoozeScript/tide-os/blob/main/LICENSE"><img src="https://img.shields.io/github/license/SnoozeScript/tide-os?style=flat&colorA=0b1a2e&colorB=3b82f6" alt="License"></a>
+  <a href="https://bun.sh"><img src="https://img.shields.io/badge/runtime-Bun-f472b6?style=flat&colorA=0b1a2e" alt="Bun"></a>
+  <a href="https://www.typescriptlang.org"><img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat&colorA=0b1a2e&logo=typescript&logoColor=white" alt="TypeScript"></a>
+  <a href="https://www.rust-lang.org"><img src="https://img.shields.io/badge/Rust-DEA584?style=flat&colorA=0b1a2e&logo=rust&logoColor=white" alt="Rust"></a>
 </p>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/@oh-my-pi/pi-coding-agent"><img src="https://img.shields.io/npm/v/@oh-my-pi/pi-coding-agent?style=flat&colorA=222222&colorB=CB3837" alt="npm version"></a>
-  <a href="https://github.com/can1357/oh-my-pi/blob/main/packages/coding-agent/CHANGELOG.md"><img src="https://img.shields.io/badge/changelog-keep-E05735?style=flat&colorA=222222" alt="Changelog"></a>
-  <a href="https://github.com/can1357/oh-my-pi/actions"><img src="https://img.shields.io/github/actions/workflow/status/can1357/oh-my-pi/ci.yml?style=flat&colorA=222222&colorB=3FB950" alt="CI"></a>
-  <a href="https://github.com/can1357/oh-my-pi/blob/main/LICENSE"><img src="https://img.shields.io/github/license/can1357/oh-my-pi?style=flat&colorA=222222&colorB=58A6FF" alt="License"></a>
-  <a href="https://www.typescriptlang.org"><img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat&colorA=222222&logo=typescript&logoColor=white" alt="TypeScript"></a>
-  <a href="https://www.rust-lang.org"><img src="https://img.shields.io/badge/Rust-DEA584?style=flat&colorA=222222&logo=rust&logoColor=white" alt="Rust"></a>
-  <a href="https://bun.sh"><img src="https://img.shields.io/badge/runtime-Bun-f472b6?style=flat&colorA=222222" alt="Bun"></a>
-  <a href="https://discord.gg/4NMW9cdXZa"><img src="https://img.shields.io/badge/Discord-5865F2?style=flat&colorA=222222&logo=discord&logoColor=white" alt="Discord"></a>
-</p>
-
-<p align="center">
-  Fork of <a href="https://github.com/badlogic/pi-mono">badlogic/pi-mono</a> by <a href="https://github.com/mariozechner">@mariozechner</a>
+  <a href="https://snoozescript.github.io/tide-os/"><strong>Website</strong></a> ·
+  <a href="https://github.com/SnoozeScript/tide-os/releases">Releases</a> ·
+  <a href="https://github.com/SnoozeScript/tide-os/issues">Issues</a>
 </p>
 
 ---
 
-## Installation
+## What is Tide?
 
-### Via Bun (recommended)
+**Tide** (_TIDE — **T**erminal **I**ntelligence **D**evelopment **E**ngine_) is an AI coding harness built for the terminal. It wraps LLMs with the scaffolding that makes them actually useful for real engineering work: tool use, session memory, LSP diagnostics, project awareness, and multi-provider model switching — all from a fast, keyboard-first TUI.
 
-Requires [Bun](https://bun.sh) runtime:
+Tide ships two ways:
 
-```bash
-bun install -g @oh-my-pi/pi-coding-agent
-```
-
-### Via installer script
-
-**Linux / macOS:**
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/can1357/oh-my-pi/main/scripts/install.sh | sh
-```
-
-**Windows (PowerShell):**
-
-```powershell
-irm https://raw.githubusercontent.com/can1357/oh-my-pi/main/scripts/install.ps1 | iex
-```
-
-By default, the installer uses bun if available, otherwise downloads the prebuilt binary.
-
-Options:
-
-- `--source` / `-Source`: Install via bun (installs bun first if needed)
-- `--binary` / `-Binary`: Always use prebuilt binary
-- `--ref <ref>` / `-Ref <ref>`: Install a tag/commit/branch (defaults to source install)
-
-```bash
-# Force bun installation
-curl -fsSL .../install.sh | sh -s -- --source
-
-# Install a tag via binary
-curl -fsSL .../install.sh | sh -s -- --binary --ref v3.20.1
-
-# Install a branch or commit via source
-curl -fsSL .../install.sh | sh -s -- --source --ref main
-```
-
-```powershell
-# Install a tag via binary
-& ([scriptblock]::Create((irm https://raw.githubusercontent.com/can1357/oh-my-pi/main/scripts/install.ps1))) -Binary -Ref v3.20.1
-
-# Install a branch or commit via source
-& ([scriptblock]::Create((irm https://raw.githubusercontent.com/can1357/oh-my-pi/main/scripts/install.ps1))) -Source -Ref main
-```
-
-### Manual download
-
-Download binaries directly from [GitHub Releases](https://github.com/can1357/oh-my-pi/releases/latest).
+| | |
+|--|--|
+| 🖥️ **Tide CLI** | A terminal coding agent you run on your existing machine. `bun run dev` and start working. |
+| 💿 **Tide OS (Live ISO)** | A bootable Debian-based live Linux environment with the agent pre-installed. Boot from USB or QEMU, auto-login as the `tide` user, and run `tide`. |
 
 ---
 
-## + Commit Tool (AI-Powered Git Commits)
+## Install
 
-AI-powered conventional commit generation with intelligent change analysis:
+### Option 1 — Clone & run with Bun (recommended)
 
-- **Agentic mode**: Tool-based git inspection with `git-overview`, `git-file-diff`, `git-hunk` for fine-grained analysis
-- **Split commits**: Automatically separates unrelated changes into atomic commits with dependency ordering
-- **Hunk-level staging**: Stage individual hunks when changes span multiple concerns
-- **Changelog generation**: Proposes and applies changelog entries to `CHANGELOG.md` files
-- **Commit validation**: Detects filler words, meta phrases, and enforces conventional commit format
-- **Legacy mode**: `--legacy` flag for deterministic pipeline when preferred
-- Run via `omp commit` with options: `--push`, `--dry-run`, `--no-changelog`, `--context`
+Requires [Bun](https://bun.sh) `>=1.3.7`:
 
-## + Python Tool (IPython Kernel)
+```bash
+git clone https://github.com/SnoozeScript/tide-os
+cd tide-os
+bun install
+bun run dev
+```
 
-<p align="center">
-  <img src="https://github.com/can1357/oh-my-pi/blob/main/assets/python.webp?raw=true" alt="python">
-</p>
+### Option 2 — Pre-built Linux binary
 
-Execute Python code with a persistent IPython kernel and 30+ shell-like helpers:
+```bash
+curl -fsSL https://github.com/SnoozeScript/tide-os/releases/latest/download/omp-linux-x64 -o omp
+chmod +x omp
+./omp
+```
 
-- **Streaming output**: Real-time stdout/stderr with image and JSON rendering
-- **Prelude helpers**: `cat()`, `sed()`, `rsed()`, `find()`, `grep()`, `batch()`, `sh()`, `run()` and more
-- **Git utilities**: `git_status()`, `git_diff()`, `git_log()`, `git_show()` for repository operations
-- **Line operations**: `extract_lines()`, `delete_lines()`, `insert_lines()`, `lines_matching()` for text manipulation
-- **Shared gateway**: Resource-efficient kernel reuse across sessions (`python.sharedGateway` setting)
-- **Custom modules**: Load extensions from `.omp/modules/` and `.pi/modules/` directories
-- **Rich output**: Supports `display()` for HTML, Markdown, images, and interactive JSON trees
-- **Mermaid diagrams**: Renders mermaid code blocks as inline graphics in iTerm2/Kitty terminals
-- Install dependencies via `omp setup python`
+### Option 3 — Bootable live ISO
 
-## + LSP Integration (Language Server Protocol)
+Download `tide-os.iso` from the [Releases](https://github.com/SnoozeScript/tide-os/releases) page, then:
 
-<p align="center">
-  <img src="https://github.com/can1357/oh-my-pi/blob/main/assets/lspv.webp?raw=true" alt="lsp">
-</p>
+```bash
+# Boot in QEMU
+qemu-system-x86_64 -cdrom tide-os.iso -m 2G -boot d
 
-Full IDE-like code intelligence with automatic formatting and diagnostics:
+# Or flash to USB
+sudo dd if=tide-os.iso of=/dev/sdX bs=4M status=progress
+```
 
-- **Format-on-write**: Auto-format code using the language server's formatter (rustfmt, gofmt, prettier, etc.)
-- **Diagnostics on write/edit**: Immediate feedback on syntax errors and type issues after every file change
-- **Workspace diagnostics**: Check entire project for errors (`lsp action=workspace_diagnostics`)
-- **40+ language configs**: Out-of-the-box support for Rust, Go, Python, TypeScript, Java, Kotlin, Scala, Haskell, OCaml, Elixir, Ruby, PHP, C#, Lua, Nix, and many more
-- **Local binary resolution**: Auto-discovers project-local LSP servers in `node_modules/.bin/`, `.venv/bin/`, etc.
-- Hover docs, symbol references, code actions, workspace-wide symbol search
+Default login: `tide` / `tide`. Type `tide` to launch the agent.
 
-## + Time Traveling Streamed Rules (TTSR)
+---
 
-<p align="center">
-  <img src="https://github.com/can1357/oh-my-pi/blob/main/assets/ttsr.webp?raw=true" alt="ttsr">
-</p>
+## Features
 
-Zero context-use rules that inject themselves only when needed:
+Tide is a full-featured coding harness. Highlights:
 
-- **Pattern-triggered injection**: Rules define regex triggers that watch the model's output stream
-- **Just-in-time activation**: When a pattern matches, the stream aborts, the rule injects as a system reminder, and the request retries
-- **Zero upfront cost**: TTSR rules consume no context until they're actually relevant
-- **One-shot per session**: Each rule only triggers once, preventing loops
-- Define via `ttsrTrigger` field in rule files (regex pattern)
-
-Example: A "don't use deprecated API" rule only activates when the model starts writing deprecated code, saving context for sessions that never touch that API.
-
-## + Interactive Code Review
-
-<p align="center">
-  <img src="https://github.com/can1357/oh-my-pi/blob/main/assets/review.webp?raw=true" alt="review">
-</p>
-
-Structured code review with priority-based findings:
-
-- **`/review` command**: Interactive mode selection (branch comparison, uncommitted changes, commit review)
-- **Structured findings**: `report_finding` tool with priority levels (P0-P3: critical → nit)
-- **Verdict rendering**: aggregates findings into approve/request-changes/comment
-- Combined result tree showing verdict and all findings
-
-## + Task Tool (Subagent System)
-
-<p align="center">
-  <img src="https://github.com/can1357/oh-my-pi/blob/main/assets/task.webp?raw=true" alt="task">
-</p>
-
-Parallel execution framework with specialized agents and real-time streaming:
-
-- **5 bundled agents**: explore, plan, browser, task, reviewer
-- **Parallel exploration**: Reviewer agent can spawn explore agents for large codebase analysis
-- **Real-time artifact streaming**: Task outputs stream as they're created, not just at completion
-- **Output tool**: Read full agent outputs by ID when truncated previews aren't sufficient
-- **Isolated execution**: `isolated: true` runs tasks in git worktrees, generates patches, and applies cleanly
-- User-level (`~/.omp/agent/agents/`) and project-level (`.omp/agents/`) custom agents
-- Concurrency-limited batch execution with progress tracking
-
-## + Model Roles
-
-<p align="center">
-  <img src="https://github.com/can1357/oh-my-pi/blob/main/assets/models.webp?raw=true" alt="models">
-</p>
-
-Configure different models for different purposes with automatic discovery:
-
-- **Three roles**: `default` (main model), `smol` (fast/cheap), `slow` (comprehensive reasoning)
-- **Auto-discovery**: Smol finds haiku → flash → mini; Slow finds codex → gpt → opus → pro
-- **Role-based selection**: Task tool agents can use `model: pi/smol` for cost-effective exploration
-- CLI args (`--smol`, `--slow`) and env vars (`PI_SMOL_MODEL`, `PI_SLOW_MODEL`)
-- Configure via `/model` selector with keybindings (Enter=default, S=smol, L=slow)
-
-## + Todo Tool (Task Tracking)
-
-Structured task management with persistent visual tracking:
-
-- **`todo_write` tool**: Create and manage task lists during coding sessions
-- **Persistent panel**: Todo list displays above the editor with real-time progress
-- **Task states**: `pending`, `in_progress`, `completed` with automatic status updates
-- **Completion reminders**: Agent warned when stopping with incomplete todos (`todoCompletion` setting)
-- **Toggle visibility**: `Ctrl+T` expands/collapses the todo panel
-
-## + Ask Tool (Interactive Questioning)
-
-<p align="center">
-  <img src="https://github.com/can1357/oh-my-pi/blob/main/assets/ask.webp?raw=true" alt="ask">
-</p>
-
-Structured user interaction with typed options:
-
-- **Multiple choice questions**: Present options with descriptions for user selection
-- **Multi-select support**: Allow multiple answers when choices aren't mutually exclusive
-- **Multi-part questions**: Ask multiple related questions in sequence via `questions` array parameter
-
-## + Custom TypeScript Slash Commands
-
-<p align="center">
-  <img src="https://github.com/can1357/oh-my-pi/blob/main/assets/slash.webp?raw=true" alt="slash">
-</p>
-
-Programmable commands with full API access:
-
-- Create at `~/.omp/agent/commands/[name]/index.ts` or `.omp/commands/[name]/index.ts`
-- Export factory returning `{ name, description, execute(args, ctx) }`
-- Full access to `HookCommandContext` for UI dialogs, session control, shell execution
-- Return string to send as LLM prompt, or void for fire-and-forget actions
-- Also loads from Claude Code directories (`~/.claude/commands/`, `.claude/commands/`)
-
-## + Universal Config Discovery
-
-<p align="center">
-  <img src="https://github.com/can1357/oh-my-pi/blob/main/assets/discovery.webp?raw=true" alt="discovery">
-</p>
-
-Unified capability-based discovery that loads configuration from 8 AI coding tools:
-
-- **Multi-tool support**: Claude Code, Cursor, Windsurf, Gemini, Codex, Cline, GitHub Copilot, VS Code
-- **Discovers everything**: MCP servers, rules, skills, hooks, tools, slash commands, prompts, context files
-- **Native format support**: Cursor MDC frontmatter, Windsurf rules, Cline `.clinerules`, Copilot `applyTo` globs, Gemini `system.md`, Codex `AGENTS.md`
-- **Provider attribution**: See which tool contributed each configuration item
-- **Discovery settings**: Enable/disable individual providers via `/config` interactive tab
-- **Priority ordering**: Multi-path resolution across `.omp`, `.pi`, and `.claude` directories
-
-## + MCP & Plugin System
-
-<p align="center">
-  <img src="https://github.com/can1357/oh-my-pi/blob/main/assets/perplexity.webp?raw=true" alt="perplexity">
-</p>
-
-Full Model Context Protocol support with external tool integration:
-
-- Stdio and HTTP transports for connecting to MCP servers
-- Plugin CLI (`omp plugin install/enable/configure/doctor`)
-- Hot-loadable plugins from `~/.omp/plugins/` with npm/bun integration
-- Automatic Exa MCP server filtering with API key extraction
-
-## + Web Search & Fetch
-
-<p align="center">
-  <img src="https://github.com/can1357/oh-my-pi/blob/main/assets/arxiv.webp?raw=true" alt="arxiv">
-</p>
-
-Multi-provider search and full-page scraping with 80+ specialized scrapers:
-
-- **Multi-provider search**: Anthropic, Perplexity, and Exa with automatic fallback chain
-- **80+ site-specific scrapers**: GitHub, GitLab, npm, PyPI, crates.io, arXiv, PubMed, Stack Overflow, Hacker News, Reddit, Wikipedia, YouTube transcripts, and many more
-- **Package registries**: npm, PyPI, crates.io, Hex, Hackage, NuGet, Maven, RubyGems, Packagist, pub.dev, Go packages
-- **Security databases**: NVD, OSV, CISA KEV vulnerability data
-- HTML-to-markdown conversion with link preservation
-
-## + SSH Tool
-
-Remote command execution with persistent connections:
-
-- **Project discovery**: Reads SSH hosts from `ssh.json` / `.ssh.json` in your project
-- **Persistent connections**: Reuses SSH connections across commands for faster execution
-- **OS/shell detection**: Automatically detects remote OS and shell type
-- **SSHFS mounts**: Optional automatic mounting of remote directories
-- **Compat mode**: Windows host support with automatic shell probing
-
-## + Browser Tool (Puppeteer with Stealth)
-
-Headless browser automation with 14 stealth scripts to evade bot detection:
-
-- **25+ actions**: Navigate, click, type, fill, scroll, drag, screenshot, evaluate JS, extract readable content
-- **Accessibility snapshots**: Observe interactive elements via the accessibility tree with numeric IDs for reliable targeting
-- **14 stealth plugins**: Custom scripts covering toString tampering, WebGL fingerprinting, audio context, screen dimensions, font enumeration, plugin/mime-type mocking, hardware concurrency, codec availability, iframe detection, locale spoofing, worker detection, and more
-- **User agent spoofing**: Removes `HeadlessChrome` identifier, generates proper Client Hints brand lists, applies overrides via CDP Network and Emulation domains
-- **Selector flexibility**: CSS, `aria/`, `text/`, `xpath/`, `pierce/` query handlers for Shadow DOM piercing
-- **Reader mode**: `extract_readable` action uses Mozilla Readability for clean article extraction
-- **Headless/visible toggle**: Switch modes at runtime via `/browser` command or `browser.headless` setting
-
-## + Cursor Provider
-
-Use your Cursor Pro subscription for AI completions:
-
-- **Browser-based OAuth**: Authenticate through Cursor's OAuth flow
-- **Tool execution bridge**: Maps Cursor's native tools to omp equivalents (read, write, shell, diagnostics)
-- **Conversation caching**: Persists context across requests in the same session
-- **Shell streaming**: Real-time stdout/stderr during command execution
-
-## + Multi-Credential Support
-
-Distribute load across multiple API keys:
-
-- **Round-robin distribution**: Automatically cycles through credentials per session
-- **Usage-aware selection**: For OpenAI Codex, checks account limits before credential selection
-- **Automatic fallback**: Switches credentials mid-session when rate limits are hit
-- **Consistent hashing**: FNV-1a hashing ensures stable credential assignment per session
-
-## + Image Generation
-
-Create images directly from the agent:
-
-- **Gemini integration**: Uses `gemini-3-pro-image-preview` by default
-- **OpenRouter fallback**: Automatically uses OpenRouter when `OPENROUTER_API_KEY` is set
-- **Inline display**: Images render in terminals supporting Kitty/iTerm2 graphics
-- Saves to temp files and reports paths for further manipulation
-
-## + TUI Overhaul
-
-Modern terminal interface with smart session management:
-
-- **Auto session titles**: Sessions automatically titled based on first message using smol model
-- **Welcome screen**: Logo, tips, recent sessions with selection
-- **Powerline footer**: Model, cwd, git branch/status, token usage, context %
-- **LSP status**: Shows which language servers are active and ready
-- **Hotkeys**: `?` displays shortcuts when editor empty
-- **Persistent prompt history**: SQLite-backed with `Ctrl+R` search across sessions
-- **Grouped tool display**: Consecutive Read calls shown in compact tree view
-- **Emergency terminal restore**: Crash handlers prevent terminal corruption
-
-## + Edit Fuzzy Matching
-
-Handles whitespace and indentation variance automatically:
-
-- High-confidence fuzzy matching for `oldText` in edit operations
-- Fixes the #1 pain point: edits failing due to invisible whitespace differences
-- Configurable via `edit.fuzzyMatch` setting (enabled by default)
-
-## + Native Engine (Rust N-API)
-
-~7,500 lines of Rust compiled to a platform-tagged N-API addon, providing performance-critical operations without shelling out to external commands:
-
-| Module          |  Lines | What it does                                                                                                                                         | Powered by                                                        |
-| --------------- | -----: | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| **grep**        | ~1,300 | Regex search over files and in-memory content, parallel/sequential modes, glob/type filtering, context lines, fuzzy find for autocomplete            | `grep-regex`, `grep-searcher`, `grep-matcher` (ripgrep internals) |
-| **shell**       | ~1,025 | Embedded bash execution with persistent sessions, streaming output, timeout/abort, custom builtins                                                   | [brush-shell](https://github.com/reubeno/brush) (vendored)        |
-| **text**        | ~1,280 | ANSI-aware visible width, truncation with ellipsis, column slicing, text wrapping that preserves SGR codes across line breaks — all UTF-16 optimized | `unicode-width`, `unicode-segmentation`                           |
-| **keys**        | ~1,300 | Kitty keyboard protocol parser with legacy xterm/VT100 fallback, modifier support, PHF perfect-hash lookup                                           | `phf`                                                             |
-| **highlight**   |   ~475 | Syntax highlighting with 11 semantic color categories, 30+ language aliases                                                                          | `syntect`                                                         |
-| **glob**        |   ~340 | Filesystem discovery with glob patterns, type filtering, mtime sorting, `.gitignore` respect                                                         | `ignore`, `globset` (ripgrep internals)                           |
-| **task**        |   ~350 | Blocking work scheduler on libuv thread pool, cooperative/external cancellation, timeout, profiling hooks                                            | `tokio`, `napi`                                                   |
-| **ps**          |   ~290 | Cross-platform process tree kill and descendant listing — `/proc` on Linux, `libproc` on macOS, `CreateToolhelp32Snapshot` on Windows                | `libc`                                                            |
-| **prof**        |   ~250 | Always-on circular buffer profiler with folded-stack output and optional SVG flamegraph generation                                                   | `inferno`                                                         |
-| **system_info** |   ~170 | Distro, kernel, CPU, disk usage without shelling out                                                                                                 | `sysinfo`                                                         |
-| **image**       |   ~150 | Decode/encode PNG/JPEG/WebP/GIF, resize with 5 sampling filters                                                                                      | `image`                                                           |
-| **clipboard**   |    ~95 | Text copy and image read from system clipboard — no `xclip`/`pbcopy` needed                                                                          | `arboard`                                                         |
-| **html**        |    ~50 | HTML-to-Markdown conversion with optional content cleaning                                                                                           | `html-to-markdown-rs`                                             |
-
-Supported platforms: `linux-x64`, `linux-arm64`, `darwin-x64`, `darwin-arm64`, `win32-x64`.
-
-## ... and many more
-
-- **`omp config` subcommand**: Manage settings from CLI (`list`, `get`, `set`, `reset`, `path`)
-- **`omp setup` subcommand**: Install optional dependencies (e.g., `omp setup python` for Jupyter kernel)
-- **`omp stats` subcommand**: Local observability dashboard for AI usage (requests, cost, cache rate, tokens/s)
-- **`xhigh` thinking level**: Extended reasoning for Anthropic models with increased token budgets
-- **Background mode**: `/background` detaches UI and continues agent execution
-- **Completion notifications**: Configurable bell/OSC99/OSC9 when agent finishes
-- **65+ built-in themes**: Catppuccin, Dracula, Nord, Gruvbox, Tokyo Night, and material variants
-- **Auto environment detection**: OS, distro, kernel, CPU, GPU, shell, terminal, DE in system prompt
-- **Git context**: System prompt includes branch, status, recent commits
-- **Bun runtime**: Native TypeScript execution, faster startup, all packages migrated
-- **Centralized file logging**: Debug logs with daily rotation to `~/.omp/logs/`
-- **Bash interceptor**: Optionally block shell commands that have dedicated tools
-- **@file auto-read**: Type `@path/to/file` in prompts to inject file contents inline
-- **Additional tools**: AST (structural code analysis), Replace (find & replace across files)
+- **Multi-provider** — Claude, ChatGPT, Copilot, Gemini, Cursor, OpenRouter, Perplexity, Mistral, Bedrock, Ollama, and more. Switch models mid-session with `Ctrl+P`.
+- **Real tool use** — Bash, git, file edits, LSP diagnostics, Python kernel, web search & fetch. Transparent execution, not a chat box.
+- **Session memory** — Every session is saved. Resume with `--continue` or `--resume`.
+- **Native TUI** — Custom terminal UI with differential rendering, streaming output, diff viewer, syntax highlighting.
+- **LSP-aware** — Format-on-write, diagnostics-on-edit, workspace-wide type checks across 40+ languages.
+- **Image generation** — Inline images in Kitty/iTerm2-compatible terminals.
+- **Plugins & MCP** — Full Model Context Protocol support, plugin CLI, hot-loadable extensions.
+- **Observable** — Built-in `omp stats` dashboard tracks tokens, latency, cost per session and provider.
+- **Rust-backed performance** — ~7,500 lines of Rust via N-API for grep, bash, text ops, image decoding, syntax highlighting.
 
 ---
 
 ## Packages
 
-| Package                                                | Description                                                                            |
-| ------------------------------------------------------ | -------------------------------------------------------------------------------------- |
-| **[@oh-my-pi/pi-ai](packages/ai)**                     | Multi-provider LLM client (Anthropic, OpenAI, Gemini, Bedrock, Cursor, Codex, Copilot) |
-| **[@oh-my-pi/pi-agent-core](packages/agent)**          | Agent runtime with tool calling and state management                                   |
-| **[@oh-my-pi/pi-coding-agent](packages/coding-agent)** | Interactive coding agent CLI                                                           |
-| **[@oh-my-pi/pi-tui](packages/tui)**                   | Terminal UI library with differential rendering                                        |
-| **[@oh-my-pi/pi-natives](packages/natives)**           | N-API bindings for grep, shell, image, text, syntax highlighting, and more             |
-| **[@oh-my-pi/omp-stats](packages/stats)**              | Local observability dashboard for AI usage statistics                                  |
+| Package | Description |
+|---|---|
+| **[@oh-my-pi/pi-ai](packages/ai)** | Multi-provider LLM client |
+| **[@oh-my-pi/pi-agent-core](packages/agent)** | Agent runtime with tool calling and state management |
+| **[@oh-my-pi/pi-coding-agent](packages/coding-agent)** | Interactive coding agent CLI (`omp` / `tide`) |
+| **[@oh-my-pi/pi-tui](packages/tui)** | Terminal UI library with differential rendering |
+| **[@oh-my-pi/pi-natives](packages/natives)** | N-API bindings for grep, shell, image, text, highlighting |
+| **[@oh-my-pi/omp-stats](packages/stats)** | Local observability dashboard |
 
-### Rust Crates
+### Rust crates
 
-| Crate                                                         | Description                                                                                                                 |
-| ------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| **[pi-natives](crates/pi-natives)**                           | N-API native addon — 13 modules, ~7,500 lines of Rust (see [feature section](#-native-performance-engine-rust-n-api) above) |
-| **[brush-core-vendored](crates/brush-core-vendored)**         | Vendored fork of [brush-shell](https://github.com/reubeno/brush) for embedded bash execution                                |
-| **[brush-builtins-vendored](crates/brush-builtins-vendored)** | Vendored bash builtins (cd, echo, test, printf, read, export, etc.)                                                         |
+| Crate | Description |
+|---|---|
+| **[pi-natives](crates/pi-natives)** | N-API native addon — grep, bash, keys, highlight, image, process tree, and more |
+| **[brush-core-vendored](crates/brush-core-vendored)** | Vendored fork of [brush-shell](https://github.com/reubeno/brush) for embedded bash execution |
+| **[brush-builtins-vendored](crates/brush-builtins-vendored)** | Vendored bash builtins |
+
+---
+
+## Development
+
+```bash
+bun run dev        # run the CLI from source
+bun run test       # run all test suites (TS + Rust)
+bun run check      # type-check + lint (TS + Rust)
+bun run fmt        # format everything
+bun run build:native  # build Rust N-API bindings
+```
+
+Releasing is automated — bump the version in `package.json`, push to `main`, and the release workflow tags, builds binaries + ISO, and publishes a GitHub Release.
+
+---
+
+## Credits
+
+Tide is a fork of [badlogic/pi-mono](https://github.com/badlogic/pi-mono) by [@mariozechner](https://github.com/mariozechner), with additional work adapted from [can1357/oh-my-pi](https://github.com/can1357/oh-my-pi). The bootable-OS layer, release automation, and rebrand are new in this fork.
 
 ---
 
 ## License
 
-MIT - Original work copyright Mario Zechner
+[MIT](LICENSE) — original work copyright Mario Zechner.
