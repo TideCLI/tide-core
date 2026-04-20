@@ -1,7 +1,7 @@
 /**
- * Centralized path helpers for omp config directories.
+ * Centralized path helpers for Tide config directories.
  *
- * Uses PI_CONFIG_DIR (default ".omp") for the config root and
+ * Uses PI_CONFIG_DIR (default ".tide") for the config root and
  * PI_CODING_AGENT_DIR to override the agent directory.
  */
 
@@ -11,11 +11,11 @@ import * as path from "node:path";
 import { version } from "../package.json" with { type: "json" };
 import { $env } from "./env";
 
-/** App name (e.g. "omp") */
-export const APP_NAME: string = "omp";
+/** App name shown in the TUI header and used for log filenames. */
+export const APP_NAME: string = "tide";
 
-/** Config directory name (e.g. ".omp") */
-export const CONFIG_DIR_NAME: string = ".omp";
+/** Config directory name (e.g. ".tide"). */
+export const CONFIG_DIR_NAME: string = ".tide";
 
 /** Version (e.g. "1.0.0") */
 export const VERSION: string = version;
