@@ -30,7 +30,7 @@ grep-searcher = "0.1"
 grep-matcher = "0.1"
 globset = "0.4"
 ignore = "0.4"
-rayon = "1.10"
+rayon = "1.12"
 inferno = { version = "0.12", default-features = false }
 image = { version = "0.25", default-features = false, features = [
    "png",
@@ -40,7 +40,7 @@ image = { version = "0.25", default-features = false, features = [
 ] }
 arboard = { version = "3.5.0", features = ["wayland-data-control"] }
 bstr = "1"
-unicode-segmentation = "1.11"
+unicode-segmentation = "1.13"
 unicode-width = "0.2"
 syntect = { version = "5.3", default-features = false, features = [
    "default-syntaxes",
