@@ -343,22 +343,25 @@ cp "$INITRD" "${ISO_DIR}/boot/initrd.img"
 # ─── Step 11: Configure GRUB (UEFI boot) ─────────────────────────────────────
 log "Configuring GRUB bootloader..."
 
-cat > "${ISO_DIR}/boot/grub/grub.cfg" <<'GRUBCFG'
+cat > "${ISO_DIR}/boot/grub/grub.cfg" <<GRUBCFG
 set timeout=5
 set default=0
 
-# Tide OS Color Theme
-set color_normal=cyan/black
-set color_highlight=white/cyan
-set menu_color_normal=cyan/black
-set menu_color_highlight=white/cyan
+# Locate the ISO filesystem by its volume label so kernel/initrd paths resolve
+search --set=root --no-floppy --label ${ISO_LABEL}
 
 insmod all_video
 insmod gfxterm
+insmod png
 terminal_output gfxterm
 
 set gfxmode=auto
 set gfxpayload=keep
+
+set color_normal=cyan/black
+set color_highlight=white/cyan
+set menu_color_normal=cyan/black
+set menu_color_highlight=white/cyan
 
 menuentry "Tide OS 1.0 — Live (Default)" {
     linux /boot/vmlinuz boot=live quiet splash
@@ -381,13 +384,23 @@ menuentry "Tide OS 1.0 — Live (RAM)" {
 }
 GRUBCFG
 
-# Create UEFI boot image
+# Minimal embedded config that the UEFI binary uses to find the real grub.cfg
+# on the ISO. Keeping it tiny avoids module-loading issues inside the EFI image.
+cat > "${WORK_DIR}/embed.cfg" <<EMBED
+search --set=root --no-floppy --label ${ISO_LABEL}
+configfile /boot/grub/grub.cfg
+EMBED
+
+# Create UEFI boot image with all modules needed to read an ISO9660 filesystem,
+# locate the volume by label, and load a Linux kernel + initrd. Missing any of
+# these modules causes the "you need to load the kernel first" error.
 grub-mkstandalone \
     --format=x86_64-efi \
     --output="${WORK_DIR}/bootx64.efi" \
     --locales="" \
     --fonts="" \
-    "boot/grub/grub.cfg=${ISO_DIR}/boot/grub/grub.cfg"
+    --modules="part_gpt part_msdos fat iso9660 loopback normal configfile search search_label search_fs_uuid search_fs_file linux linuxefi echo all_video gfxterm gfxmenu efi_gop efi_uga video boot chain reboot halt test ls cat help" \
+    "boot/grub/grub.cfg=${WORK_DIR}/embed.cfg"
 
 # Create FAT EFI system partition image
 dd if=/dev/zero of="${ISO_DIR}/boot/grub/efi.img" bs=1M count=10
