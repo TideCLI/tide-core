@@ -56,7 +56,7 @@ smallvec = { version = "1.15.1", features = [
    "specialization",
    "const_new",
 ] }
-heapless = { version = "0.9.2", features = ["serde", "nightly"] }
+heapless = { version = "0.9.3", features = ["serde", "nightly"] }
 
 [target.'cfg(unix)'.dependencies]
 libc = "0.2"
