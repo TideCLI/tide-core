@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - "index.html"
+      - "tideos-ppt/**"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -29,8 +30,9 @@ jobs:
 
       - name: Prepare site directory
         run: |
-          mkdir -p _site
+          mkdir -p _site/tideos-ppt
           cp index.html _site/
+          cp tideos-ppt/index.html _site/tideos-ppt/
 
       - uses: actions/configure-pages@v5
         with:

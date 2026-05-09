@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Tide OS — Project Presentation</title>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Geist:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#030712;--surface:rgba(15,23,42,.6);--border:rgba(125,211,252,.1);--border-hi:rgba(125,211,252,.25);--text:#e6f1ff;--dim:#7a8ba0;--faint:#4a5868;--cyan:#22d3ee;--blue:#3b82f6;--mint:#5eead4;--amber:#e8b77a;--grad:linear-gradient(135deg,#3b82f6,#22d3ee);--add:#7ee2a8;--del:#f07c82}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Geist',system-ui,sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+
+/* Fullscreen slides */
+.deck{position:relative;width:100%;height:100vh}
+.slide{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .6s ease,transform .6s ease;transform:scale(.97);padding:40px}
+.slide.active{opacity:1;pointer-events:auto;transform:scale(1)}
+.slide.prev{opacity:0;transform:scale(1.03)}
+
+/* Background effects */
+.slide::before{content:'';position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:60px 60px;mask-image:radial-gradient(circle at 50% 40%,black,transparent 70%);opacity:.4;pointer-events:none}
+.slide::after{content:'';position:absolute;top:-20%;left:50%;transform:translateX(-50%);width:80vw;height:50vh;background:radial-gradient(ellipse,rgba(59,130,246,.12),transparent 70%);pointer-events:none}
+
+.slide-inner{position:relative;z-index:1;width:100%;max-width:900px;text-align:center}
+
+/* Animated entrance for children */
+.slide.active .anim{animation:slideUp .5s ease both}
+.slide.active .anim:nth-child(1){animation-delay:.1s}
+.slide.active .anim:nth-child(2){animation-delay:.2s}
+.slide.active .anim:nth-child(3){animation-delay:.3s}
+.slide.active .anim:nth-child(4){animation-delay:.4s}
+.slide.active .anim:nth-child(5){animation-delay:.5s}
+.slide.active .anim:nth-child(6){animation-delay:.6s}
+.slide.active .anim:nth-child(7){animation-delay:.7s}
+@keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+
+/* Pill */
+.pill{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border:1px solid var(--border-hi);background:rgba(34,211,238,.08);border-radius:999px;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--cyan);margin-bottom:24px}
+.pill .dot{width:6px;height:6px;background:var(--amber);border-radius:50%;box-shadow:0 0 12px var(--amber);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* Typography */
+.slide-num{font-family:'Geist Mono',monospace;font-size:13px;color:var(--cyan);opacity:.6;letter-spacing:3px;margin-bottom:12px}
+h1{font-size:clamp(36px,6vw,64px);font-weight:800;letter-spacing:-.04em;line-height:1;margin-bottom:16px}
+h1 em{font-style:normal;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+h2{font-size:clamp(28px,4vw,44px);font-weight:700;letter-spacing:-.03em;margin-bottom:8px}
+h2 em{font-style:normal;color:var(--cyan)}
+.subtitle{color:var(--dim);font-size:clamp(15px,1.8vw,19px);max-width:600px;margin:0 auto 32px;line-height:1.6}
+
+/* Points list */
+.points{text-align:left;max-width:700px;margin:0 auto}
+.point{display:flex;gap:16px;padding:14px 0;border-bottom:1px solid var(--border);font-size:15px;color:var(--dim);line-height:1.6}
+.point:last-child{border-bottom:none}
+.point::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--cyan);flex-shrink:0;margin-top:7px;box-shadow:0 0 10px rgba(34,211,238,.4)}
+
+/* Metrics */
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:28px;max-width:700px;margin-left:auto;margin-right:auto}
+.metric{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px 16px;backdrop-filter:blur(8px);text-align:center;transition:border-color .3s,transform .3s}
+.metric:hover{border-color:var(--cyan);transform:translateY(-4px)}
+.metric .val{font-size:32px;font-weight:800;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;line-height:1.1}
+.metric .lbl{color:var(--faint);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin-top:6px}
+
+/* Highlight box */
+.highlight{background:rgba(34,211,238,.06);border:1px solid var(--border-hi);border-radius:10px;padding:20px 24px;margin-top:24px;max-width:700px;margin-left:auto;margin-right:auto;text-align:left}
+.highlight p{color:var(--dim);font-size:14px;line-height:1.7}
+.highlight strong{color:var(--cyan)}
+
+/* Timeline */
+.timeline{text-align:left;max-width:700px;margin:0 auto}
+.phase{display:flex;gap:20px;padding:16px 0;border-left:2px solid var(--border-hi);margin-left:8px;padding-left:24px;position:relative}
+.phase::before{content:'';position:absolute;left:-5px;top:22px;width:10px;height:10px;border-radius:50%;background:var(--cyan);box-shadow:0 0 12px rgba(34,211,238,.5)}
+.phase-week{color:var(--cyan);font-family:'Geist Mono',monospace;font-size:13px;min-width:90px;font-weight:600;padding-top:1px}
+.phase-desc{color:var(--dim);font-size:14px;line-height:1.5}
+
+/* Table */
+.tbl{width:100%;max-width:700px;margin:20px auto 0;border-collapse:collapse;font-size:14px;text-align:left}
+.tbl th{padding:10px 14px;border-bottom:2px solid var(--border-hi);color:var(--cyan);font-size:12px;text-transform:uppercase;letter-spacing:1.5px;font-weight:600}
+.tbl td{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--dim)}
+.tbl code{font-family:'Geist Mono',monospace;color:var(--amber);font-size:13px}
+.tbl tr:hover td{color:var(--text)}
+
+/* Navigation */
+.nav-bar{position:fixed;bottom:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:12px 24px;background:rgba(3,7,18,.85);backdrop-filter:blur(12px);border-top:1px solid var(--border)}
+.nav-bar button{padding:8px 20px;border:1px solid var(--border);background:transparent;border-radius:6px;color:var(--dim);cursor:pointer;font-size:13px;font-family:inherit;transition:all .25s}
+.nav-bar button:hover:not(:disabled){border-color:var(--cyan);color:var(--cyan)}
+.nav-bar button:disabled{opacity:.25;cursor:default}
+.nav-dots{display:flex;gap:6px;align-items:center}
+.nav-dot{width:8px;height:8px;border-radius:50%;background:var(--faint);border:none;cursor:pointer;transition:all .3s;padding:0}
+.nav-dot.active{background:var(--cyan);box-shadow:0 0 10px rgba(34,211,238,.5);transform:scale(1.3)}
+.nav-dot:hover{background:var(--cyan)}
+.counter{color:var(--faint);font-family:'Geist Mono',monospace;font-size:12px;min-width:50px;text-align:center}
+
+/* Progress bar */
+.progress{position:fixed;top:0;left:0;height:2px;background:var(--grad);z-index:200;transition:width .4s ease}
+
+/* Back link */
+.back{position:fixed;top:16px;left:20px;z-index:100;color:var(--dim);text-decoration:none;font-size:13px;display:flex;align-items:center;gap:6px;transition:color .2s}
+.back:hover{color:var(--cyan)}
+.brand{position:fixed;top:16px;right:20px;z-index:100;font-size:14px;font-weight:600;letter-spacing:1px;text-transform:uppercase;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+
+@media(max-width:640px){
+.slide{padding:24px 16px 80px}
+.phase{flex-direction:column;gap:4px}
+.metrics{grid-template-columns:repeat(2,1fr)}
+.point{font-size:14px}
+}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+<a href="../" class="back">← Home</a>
+<div class="brand">Tide OS</div>
+
+<div class="deck" id="deck">
+
+<!-- Slide 0: Title -->
+<div class="slide active" data-i="0">
+<div class="slide-inner">
+<div class="anim"><div class="pill"><span class="dot"></span>Final Year Project — B.Tech CSE</div></div>
+<h1 class="anim"><em>Tide OS</em></h1>
+<p class="subtitle anim">Terminal Intelligence Development Engine — An AI coding agent delivered as a CLI and a bootable Linux ISO.</p>
+<div class="metrics anim">
+<div class="metric"><div class="val">226K</div><div class="lbl">Lines TS</div></div>
+<div class="metric"><div class="val">7,500</div><div class="lbl">Lines Rust</div></div>
+<div class="metric"><div class="val">10+</div><div class="lbl">Providers</div></div>
+<div class="metric"><div class="val">&lt;3GB</div><div class="lbl">ISO Size</div></div>
+</div>
+</div>
+</div>
+
+<!-- Slide 1: Introduction -->
+<div class="slide" data-i="1">
+<div class="slide-inner">
+<div class="slide-num anim">01</div>
+<h2 class="anim"><em>Introduction</em></h2>
+<p class="subtitle anim">The convergence of LLMs and terminal-native development</p>
+<div class="points">
+<div class="point anim">LLMs have enabled AI-powered code generation, debugging, and reasoning in software development.</div>
+<div class="point anim">Tools like GitHub Copilot, Cursor, and Codeium work only inside graphical IDEs.</div>
+<div class="point anim">Terminal-native developers (Vim, SSH, tmux users) have no equivalent AI assistance.</div>
+<div class="point anim">Tide OS is an AI coding agent for the terminal, also available as a bootable Linux ISO.</div>
+</div>
+</div>
+</div>
+
+<!-- Slide 2: Problem Statement -->
+<div class="slide" data-i="2">
+<div class="slide-inner">
+<div class="slide-num anim">02</div>
+<h2 class="anim"><em>Problem</em> Statement</h2>
+<p class="subtitle anim">Critical gaps in the current AI coding landscape</p>
+<div class="points">
+<div class="point anim">All AI coding assistants are locked to GUI editors — no terminal-native solution exists.</div>
+<div class="point anim">Existing tools require constant internet — unusable in offline or air-gapped environments.</div>
+<div class="point anim">Source code is sent to cloud servers on every interaction — privacy and IP risk.</div>
+<div class="point anim">No OS ships AI as a core service — it's always an afterthought plugin.</div>
+</div>
+</div>
+</div>
+
+<!-- Slide 3: Objectives -->
+<div class="slide" data-i="3">
+<div class="slide-inner">
+<div class="slide-num anim">03</div>
+<h2 class="anim"><em>Objectives</em></h2>
+<p class="subtitle anim">What we set out to build</p>
+<div class="points">
+<div class="point anim">Build a terminal-native AI agent with multi-provider LLM support (Claude, GPT, Gemini, Ollama).</div>
+<div class="point anim">Develop a Rust N-API layer (~7,500 lines) for high-performance grep, highlighting, and shell execution.</div>
+<div class="point anim">Implement TTSR token optimization to reduce system prompt overhead by 73%.</div>
+<div class="point anim">Package the entire environment into a bootable Live ISO under 3 GB.</div>
+</div>
+<div class="metrics anim">
+<div class="metric"><div class="val">10+</div><div class="lbl">Providers</div></div>
+<div class="metric"><div class="val">7,500</div><div class="lbl">Lines Rust</div></div>
+<div class="metric"><div class="val">73%</div><div class="lbl">Token Cut</div></div>
+<div class="metric"><div class="val">&lt;3GB</div><div class="lbl">ISO</div></div>
+</div>
+</div>
+</div>
+
+<!-- Slide 4: Base Paper -->
+<div class="slide" data-i="4">
+<div class="slide-inner">
+<div class="slide-num anim">04</div>
+<h2 class="anim">Base <em>Paper</em></h2>
+<p class="subtitle anim">ReAct: Synergizing Reasoning and Acting — Yao et al., ICLR 2023</p>
+<div class="points">
+<div class="point anim">Proposes interleaving reasoning traces with tool actions in an iterative loop.</div>
+<div class="point anim">Grounding reasoning in real-world feedback reduces hallucination significantly.</div>
+<div class="point anim">Evaluated on HotpotQA, FEVER, ALFWorld, WebShop — outperforms reasoning-only methods.</div>
+<div class="point anim">Tide OS adopts ReAct as its core agent execution loop for autonomous coding tasks.</div>
+</div>
+<div class="highlight anim"><p><strong>Thought → Action → Observation</strong> — The agent reasons about a task, invokes a tool (file read, bash, grep), observes the result, and iterates until the task is complete.</p></div>
+</div>
+</div>
+
+<!-- Slide 5: Innovation -->
+<div class="slide" data-i="5">
+<div class="slide-inner">
+<div class="slide-num anim">05</div>
+<h2 class="anim"><em>Innovation</em></h2>
+<p class="subtitle anim">What makes Tide OS unique</p>
+<div class="points">
+<div class="point anim">First AI coding tool delivered as a bootable Linux ISO — agent is an OS-level service.</div>
+<div class="point anim">Rust N-API achieves up to 78x speedup over JavaScript for critical terminal operations.</div>
+<div class="point anim">TTSR dynamically injects rules into LLM context, cutting prompt tokens by 73% and costs by 26%.</div>
+<div class="point anim">Stealth browser with 14 evasion layers enables autonomous web research (reCAPTCHA 0.9+).</div>
+</div>
+</div>
+</div>
+
+<!-- Slide 6: Work Plan -->
+<div class="slide" data-i="6">
+<div class="slide-inner">
+<div class="slide-num anim">06</div>
+<h2 class="anim">Work <em>Plan</em></h2>
+<p class="subtitle anim">20-week development timeline</p>
+<div class="timeline">
+<div class="phase anim"><div class="phase-week">Wk 1-3</div><div class="phase-desc">Literature survey, architecture design, ReAct loop planning.</div></div>
+<div class="phase anim"><div class="phase-week">Wk 4-8</div><div class="phase-desc">Multi-provider LLM client, agent runtime, 18+ built-in tools.</div></div>
+<div class="phase anim"><div class="phase-week">Wk 9-12</div><div class="phase-desc">Rust N-API native addon, custom TUI with differential rendering.</div></div>
+<div class="phase anim"><div class="phase-week">Wk 13-16</div><div class="phase-desc">Live ISO build, TTSR engine, stealth browser, MCP plugins.</div></div>
+<div class="phase anim"><div class="phase-week">Wk 17-20</div><div class="phase-desc">Testing (25 test cases), benchmarking, documentation.</div></div>
+</div>
+</div>
+</div>
+
+<!-- Slide 7: Requirements -->
+<div class="slide" data-i="7">
+<div class="slide-inner">
+<div class="slide-num anim">07</div>
+<h2 class="anim">Software <em>Requirements</em></h2>
+<p class="subtitle anim">Technology stack and dependencies</p>
+<table class="tbl anim">
+<thead><tr><th>Component</th><th>Requirement</th></tr></thead>
+<tbody>
+<tr><td>OS</td><td>Debian Bookworm 12, kernel 6.1 LTS</td></tr>
+<tr><td>Runtime</td><td><code>Bun v1.1+</code></td></tr>
+<tr><td>Rust</td><td><code>rustc / cargo v1.75+</code></td></tr>
+<tr><td>VCS</td><td><code>Git 2.39+</code></td></tr>
+<tr><td>Browser</td><td>Chromium (Puppeteer)</td></tr>
+<tr><td>ISO Tools</td><td><code>debootstrap, mksquashfs, xorriso</code></td></tr>
+<tr><td>API Keys</td><td>Anthropic / OpenAI / Gemini (min. one)</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- Slide 8: Outcomes -->
+<div class="slide" data-i="8">
+<div class="slide-inner">
+<div class="slide-num anim">08</div>
+<h2 class="anim"><em>Outcomes</em></h2>
+<p class="subtitle anim">Benchmark results and validation</p>
+<div class="points">
+<div class="point anim">Rust N-API: up to 78x speedup, 30+ FPS terminal UI under heavy load.</div>
+<div class="point anim">TTSR: 73.3% system prompt reduction, 26-28% API cost savings across providers.</div>
+<div class="point anim">Bootable ISO: boots in &lt;60s on QEMU/VirtualBox/USB, zero configuration.</div>
+<div class="point anim">25/25 test cases passed across all 5 subsystems, 98.4% fuzzy match accuracy.</div>
+</div>
+<div class="metrics anim">
+<div class="metric"><div class="val">78x</div><div class="lbl">Max Speedup</div></div>
+<div class="metric"><div class="val">30+</div><div class="lbl">FPS</div></div>
+<div class="metric"><div class="val">26%</div><div class="lbl">Cost Saved</div></div>
+<div class="metric"><div class="val">25/25</div><div class="lbl">Tests</div></div>
+</div>
+</div>
+</div>
+
+<!-- Slide 9: Conclusion -->
+<div class="slide" data-i="9">
+<div class="slide-inner">
+<div class="slide-num anim">09</div>
+<h2 class="anim"><em>Conclusion</em></h2>
+<div class="highlight anim" style="margin-top:0"><p style="font-size:16px;line-height:1.8">Tide OS delivers a fully autonomous, terminal-native AI coding agent with a <strong>Rust performance layer</strong> (up to 78x speedup) and <strong>TTSR token optimization</strong> (73% prompt reduction, 26%+ cost savings). It is the <strong>first AI tool available as a bootable Linux ISO</strong>, enabling zero-config AI development on any machine.</p></div>
+</div>
+</div>
+
+<!-- Slide 10: Future -->
+<div class="slide" data-i="10">
+<div class="slide-inner">
+<div class="slide-num anim">10</div>
+<h2 class="anim">Future <em>Scope</em></h2>
+<p class="subtitle anim">What comes next</p>
+<div class="points">
+<div class="point anim">Direct llama.cpp / vLLM integration for fully offline air-gapped operation.</div>
+<div class="point anim">Kitty/WezTerm graphics protocols for inline diagrams and rich charts.</div>
+<div class="point anim">WebSocket-based collaborative multi-developer sessions.</div>
+<div class="point anim">Persistent USB partitions to convert Tide OS into a permanent portable workstation.</div>
+</div>
+</div>
+</div>
+
+</div>
+
+<!-- Nav -->
+<div class="nav-bar">
+<button id="prevBtn" onclick="go(-1)">← Prev</button>
+<div class="nav-dots" id="dots"></div>
+<span class="counter" id="ctr">1 / 11</span>
+<button id="nextBtn" onclick="go(1)">Next →</button>
+</div>
+
+<script>
+const slides=document.querySelectorAll('.slide'),total=slides.length;
+let cur=0;
+const dots=document.getElementById('dots'),ctr=document.getElementById('ctr'),prog=document.getElementById('progress');
+
+// Build dots
+for(let i=0;i<total;i++){const d=document.createElement('button');d.className='nav-dot'+(i===0?' active':'');d.onclick=()=>goTo(i);dots.appendChild(d)}
+
+function goTo(n){
+if(n<0||n>=total||n===cur)return;
+const prev=slides[cur];
+prev.classList.remove('active');prev.classList.add('prev');
+setTimeout(()=>prev.classList.remove('prev'),600);
+cur=n;
+slides[cur].classList.add('active');
+// Reset animations
+slides[cur].querySelectorAll('.anim').forEach(el=>{el.style.animation='none';el.offsetHeight;el.style.animation=''});
+update();
+}
+function go(d){goTo(cur+d)}
+function update(){
+ctr.textContent=`${cur+1} / ${total}`;
+document.getElementById('prevBtn').disabled=cur===0;
+document.getElementById('nextBtn').disabled=cur===total-1;
+dots.querySelectorAll('.nav-dot').forEach((d,i)=>d.classList.toggle('active',i===cur));
+prog.style.width=`${(cur/(total-1))*100}%`;
+}
+
+// Keyboard + touch
+document.addEventListener('keydown',e=>{
+if(e.key==='ArrowRight'||e.key===' '||e.key==='Enter')go(1);
+if(e.key==='ArrowLeft')go(-1);
+});
+let tx=0;
+document.addEventListener('touchstart',e=>{tx=e.touches[0].clientX},{passive:true});
+document.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50){dx<0?go(1):go(-1)}},{passive:true});
+update();
+</script>
+</body>
+</html>
