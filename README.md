@@ -2,11 +2,10 @@
 
 <p align="center">
   <strong>Terminal Intelligence Development Engine</strong><br>
-  An AI coding harness for your terminal — available as a CLI or a bootable live Linux ISO.
+  An AI coding harness for your terminal - available as a CLI or a bootable live Linux ISO.
 </p>
 
 <p align="center">
-  <a href="https://github.com/TideCLI/tide-core/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/TideCLI/tide-core/ci.yml?branch=main&style=flat&colorA=0b1a2e&colorB=22d3ee&label=CI" alt="CI"></a>
   <a href="https://github.com/TideCLI/tide-core/releases"><img src="https://img.shields.io/github/v/release/TideCLI/tide-core?include_prereleases&style=flat&colorA=0b1a2e&colorB=22d3ee&label=release" alt="Release"></a>
   <a href="https://github.com/TideCLI/tide-core/blob/main/LICENSE"><img src="https://img.shields.io/github/license/TideCLI/tide-core?style=flat&colorA=0b1a2e&colorB=3b82f6" alt="License"></a>
   <a href="https://bun.sh"><img src="https://img.shields.io/badge/runtime-Bun-f472b6?style=flat&colorA=0b1a2e" alt="Bun"></a>
@@ -15,16 +14,19 @@
 </p>
 
 <p align="center">
-  <a href="https://tidecli.github.io/tide-core/"><strong>Website</strong></a> ·
   <a href="https://github.com/TideCLI/tide-core/releases">Releases</a> ·
   <a href="https://github.com/TideCLI/tide-core/issues">Issues</a>
+</p>
+
+<p align="center">
+  <em>Tide is a final-year project. Development has concluded and the repository is archived. The source is published for reference; issues and pull requests are disabled.</em>
 </p>
 
 ---
 
 ## What is Tide?
 
-**Tide** (_TIDE — **T**erminal **I**ntelligence **D**evelopment **E**ngine_) is an AI coding harness built for the terminal. It wraps LLMs with the scaffolding that makes them actually useful for real engineering work: tool use, session memory, LSP diagnostics, project awareness, and multi-provider model switching — all from a fast, keyboard-first TUI.
+**Tide** (_TIDE - **T**erminal **I**ntelligence **D**evelopment **E**ngine_) is an AI coding harness built for the terminal. It wraps LLMs with the scaffolding that makes them actually useful for real engineering work: tool use, session memory, LSP diagnostics, project awareness, and multi-provider model switching - all from a fast, keyboard-first TUI.
 
 Tide ships two ways:
 
@@ -37,7 +39,7 @@ Tide ships two ways:
 
 ## Install
 
-### Option 1 — Clone & run with Bun (recommended)
+### Option 1 - Clone & run with Bun (recommended)
 
 Requires [Bun](https://bun.sh) `>=1.3.7`:
 
@@ -48,7 +50,7 @@ bun install
 bun run dev
 ```
 
-### Option 2 — Pre-built Linux binary
+### Option 2 - Pre-built Linux binary
 
 ```bash
 curl -fsSL https://github.com/TideCLI/tide-core/releases/latest/download/omp-linux-x64 -o omp
@@ -56,7 +58,7 @@ chmod +x omp
 ./omp
 ```
 
-### Option 3 — Bootable live ISO
+### Option 3 - Bootable live ISO
 
 Download the latest `tide-os-*.iso` from the [Releases](https://github.com/TideCLI/tide-core/releases) page, then:
 
@@ -76,15 +78,15 @@ Default login: `tide` / `tide`. Type `tide` to launch the agent.
 
 Tide is a full-featured coding harness. Highlights:
 
-- **Multi-provider** — Claude, ChatGPT, Copilot, Gemini, Cursor, OpenRouter, Perplexity, Mistral, Bedrock, Ollama, and more. Switch models mid-session with `Ctrl+P`.
-- **Real tool use** — Bash, git, file edits, LSP diagnostics, Python kernel, web search & fetch. Transparent execution, not a chat box.
-- **Session memory** — Every session is saved. Resume with `--continue` or `--resume`.
-- **Native TUI** — Custom terminal UI with differential rendering, streaming output, diff viewer, syntax highlighting.
-- **LSP-aware** — Format-on-write, diagnostics-on-edit, workspace-wide type checks across 40+ languages.
-- **Image generation** — Inline images in Kitty/iTerm2-compatible terminals.
-- **Plugins & MCP** — Full Model Context Protocol support, plugin CLI, hot-loadable extensions.
-- **Observable** — Built-in `omp stats` dashboard tracks tokens, latency, cost per session and provider.
-- **Rust-backed performance** — ~7,500 lines of Rust via N-API for grep, bash, text ops, image decoding, syntax highlighting.
+- **Multi-provider** - Claude, ChatGPT, Copilot, Gemini, Cursor, OpenRouter, Perplexity, Mistral, Bedrock, Ollama, and more. Switch models mid-session with `Ctrl+P`.
+- **Real tool use** - Bash, git, file edits, LSP diagnostics, Python kernel, web search & fetch. Transparent execution, not a chat box.
+- **Session memory** - Every session is saved. Resume with `--continue` or `--resume`.
+- **Native TUI** - Custom terminal UI with differential rendering, streaming output, diff viewer, syntax highlighting.
+- **LSP-aware** - Format-on-write, diagnostics-on-edit, workspace-wide type checks across 40+ languages.
+- **Image generation** - Inline images in Kitty/iTerm2-compatible terminals.
+- **Plugins & MCP** - Full Model Context Protocol support, plugin CLI, hot-loadable extensions.
+- **Observable** - Built-in `omp stats` dashboard tracks tokens, latency, cost per session and provider.
+- **Rust-backed performance** - ~7,500 lines of Rust via N-API for grep, bash, text ops, image decoding, syntax highlighting.
 
 ---
 
@@ -103,7 +105,7 @@ Tide is a full-featured coding harness. Highlights:
 
 | Crate | Description |
 |---|---|
-| **[pi-natives](crates/pi-natives)** | N-API native addon — grep, bash, keys, highlight, image, process tree, and more |
+| **[pi-natives](crates/pi-natives)** | N-API native addon - grep, bash, keys, highlight, image, process tree, and more |
 | **[brush-core-vendored](crates/brush-core-vendored)** | Vendored fork of [brush-shell](https://github.com/reubeno/brush) for embedded bash execution |
 | **[brush-builtins-vendored](crates/brush-builtins-vendored)** | Vendored bash builtins |
 
@@ -119,13 +121,30 @@ bun run fmt        # format everything
 bun run build:native  # build Rust N-API bindings
 ```
 
-Releasing is automated — bump the version in `package.json`, push to `main`, and the release workflow tags, builds binaries + ISO, and publishes a GitHub Release.
-
 ---
 
 ## Credits
 
-Tide builds on [can1357/oh-my-pi](https://github.com/can1357/oh-my-pi). The bootable-OS layer, release automation, and rebrand are new in Tide.
+<table>
+	<tr>
+		<td align="center">
+			<a href="https://github.com/SnoozeScript">
+				<img src="https://github.com/SnoozeScript.png?size=100" width="100" alt="Aadil (@SnoozeScript)" />
+				<br />
+				<sub><b>Aadil</b> · @SnoozeScript</sub>
+			</a>
+		</td>
+		<td align="center">
+			<a href="https://github.com/omghante">
+				<img src="https://github.com/omghante.png?size=100" width="100" alt="Om Ghante (@omghante)" />
+				<br />
+				<sub><b>Om Ghante</b> · @omghante</sub>
+			</a>
+		</td>
+	</tr>
+</table>
+
+Developed as a final-year project. Tide builds on [can1357/oh-my-pi](https://github.com/can1357/oh-my-pi); the bootable-OS layer, release automation, and rebrand are new in Tide.
 
 ---
 

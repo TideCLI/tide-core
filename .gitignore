@@ -2,3 +2,15 @@
 .backup/
 node_modules/
 target/
+
+# AI assistant local state
+.claude/
+.mimosa/
+.zcode/
+
+# Environment / secrets
+.env
+.env.*
+
+# OS junk
+.DS_Store
