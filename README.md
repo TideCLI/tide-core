@@ -1,4 +1,4 @@
-<h1 align="center">🌊 Tide OS</h1>
+<h1 align="center">🌊 Tide</h1>
 
 <p align="center">
   <strong>Terminal Intelligence Development Engine</strong><br>
@@ -6,18 +6,18 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/SnoozeScript/tide-os/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/SnoozeScript/tide-os/ci.yml?branch=main&style=flat&colorA=0b1a2e&colorB=22d3ee&label=CI" alt="CI"></a>
-  <a href="https://github.com/SnoozeScript/tide-os/releases"><img src="https://img.shields.io/github/v/release/SnoozeScript/tide-os?include_prereleases&style=flat&colorA=0b1a2e&colorB=22d3ee&label=release" alt="Release"></a>
-  <a href="https://github.com/SnoozeScript/tide-os/blob/main/LICENSE"><img src="https://img.shields.io/github/license/SnoozeScript/tide-os?style=flat&colorA=0b1a2e&colorB=3b82f6" alt="License"></a>
+  <a href="https://github.com/TideCLI/tide-core/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/TideCLI/tide-core/ci.yml?branch=main&style=flat&colorA=0b1a2e&colorB=22d3ee&label=CI" alt="CI"></a>
+  <a href="https://github.com/TideCLI/tide-core/releases"><img src="https://img.shields.io/github/v/release/TideCLI/tide-core?include_prereleases&style=flat&colorA=0b1a2e&colorB=22d3ee&label=release" alt="Release"></a>
+  <a href="https://github.com/TideCLI/tide-core/blob/main/LICENSE"><img src="https://img.shields.io/github/license/TideCLI/tide-core?style=flat&colorA=0b1a2e&colorB=3b82f6" alt="License"></a>
   <a href="https://bun.sh"><img src="https://img.shields.io/badge/runtime-Bun-f472b6?style=flat&colorA=0b1a2e" alt="Bun"></a>
   <a href="https://www.typescriptlang.org"><img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat&colorA=0b1a2e&logo=typescript&logoColor=white" alt="TypeScript"></a>
   <a href="https://www.rust-lang.org"><img src="https://img.shields.io/badge/Rust-DEA584?style=flat&colorA=0b1a2e&logo=rust&logoColor=white" alt="Rust"></a>
 </p>
 
 <p align="center">
-  <a href="https://snoozescript.github.io/tide-os/"><strong>Website</strong></a> ·
-  <a href="https://github.com/SnoozeScript/tide-os/releases">Releases</a> ·
-  <a href="https://github.com/SnoozeScript/tide-os/issues">Issues</a>
+  <a href="https://tidecli.github.io/tide-core/"><strong>Website</strong></a> ·
+  <a href="https://github.com/TideCLI/tide-core/releases">Releases</a> ·
+  <a href="https://github.com/TideCLI/tide-core/issues">Issues</a>
 </p>
 
 ---
@@ -31,7 +31,7 @@ Tide ships two ways:
 | | |
 |--|--|
 | 🖥️ **Tide CLI** | A terminal coding agent you run on your existing machine. `bun run dev` and start working. |
-| 💿 **Tide OS (Live ISO)** | A bootable Debian-based live Linux environment with the agent pre-installed. Boot from USB or QEMU, auto-login as the `tide` user, and run `tide`. |
+| 💿 **Tide (Live ISO)** | A bootable Debian-based live Linux environment with the agent pre-installed. Boot from USB or QEMU, auto-login as the `tide` user, and run `tide`. |
 
 ---
 
@@ -42,8 +42,8 @@ Tide ships two ways:
 Requires [Bun](https://bun.sh) `>=1.3.7`:
 
 ```bash
-git clone https://github.com/SnoozeScript/tide-os
-cd tide-os
+git clone https://github.com/TideCLI/tide-core
+cd tide-core
 bun install
 bun run dev
 ```
@@ -51,14 +51,14 @@ bun run dev
 ### Option 2 — Pre-built Linux binary
 
 ```bash
-curl -fsSL https://github.com/SnoozeScript/tide-os/releases/latest/download/omp-linux-x64 -o omp
+curl -fsSL https://github.com/TideCLI/tide-core/releases/latest/download/omp-linux-x64 -o omp
 chmod +x omp
 ./omp
 ```
 
 ### Option 3 — Bootable live ISO
 
-Download `tide-os.iso` from the [Releases](https://github.com/SnoozeScript/tide-os/releases) page, then:
+Download the latest `tide-os-*.iso` from the [Releases](https://github.com/TideCLI/tide-core/releases) page, then:
 
 ```bash
 # Boot in QEMU
@@ -125,10 +125,10 @@ Releasing is automated — bump the version in `package.json`, push to `main`, a
 
 ## Credits
 
-Tide is a fork of [badlogic/pi-mono](https://github.com/badlogic/pi-mono) by [@mariozechner](https://github.com/mariozechner), with additional work adapted from [can1357/oh-my-pi](https://github.com/can1357/oh-my-pi). The bootable-OS layer, release automation, and rebrand are new in this fork.
+Tide builds on [can1357/oh-my-pi](https://github.com/can1357/oh-my-pi). The bootable-OS layer, release automation, and rebrand are new in Tide.
 
 ---
 
 ## License
 
-[MIT](LICENSE) — original work copyright Mario Zechner.
+[MIT](LICENSE)
